@@ -67,6 +67,9 @@ def get_spectrogram_and_label_id(audio, label):
   label_id = tf.argmax(label == commands)
   return spectrogram, label_id
 
+spectrogram_ds = waveform_ds.map(
+    get_spectrogram_and_label_id, num_parallel_calls=AUTOTUNE)
+
 def get_spectrogram(waveform):
   # Padding for files with less than 16000 samples
   zero_padding = tf.zeros([16000] - tf.shape(waveform), dtype=tf.float32)
