@@ -61,6 +61,10 @@ def get_waveform_and_label(file_path):
   waveform = decode_audio(audio_binary)
   return waveform, label
 
+AUTOTUNE = tf.data.AUTOTUNE
+files_ds = tf.data.Dataset.from_tensor_slices(train_files)
+waveform_ds = files_ds.map(get_waveform_and_label, num_parallel_calls=AUTOTUNE)
+
 def get_spectrogram_and_label_id(audio, label):
   spectrogram = get_spectrogram(audio)
   spectrogram = tf.expand_dims(spectrogram, -1)
@@ -84,6 +88,10 @@ def get_spectrogram(waveform):
   spectrogram = tf.abs(spectrogram)
 
   return spectrogram
+
+for waveform, label in waveform_ds.take(1):
+  label = label.numpy().decode('utf-8')
+  spectrogram = get_spectrogram(waveform)
 
  #building and training model
 
