@@ -16,14 +16,7 @@ seed = 42
 tf.random.set_seed(seed)
 np.random.seed(seed)
 
-data_dir = pathlib.Path('data/mini_speech_commands')
-if not data_dir.exists():
-  tf.keras.utils.get_file(
-      'mini_speech_commands.zip',
-      origin="http://storage.googleapis.com/download.tensorflow.org/data/mini_speech_commands.zip",
-      extract=True,
-      cache_dir='.', cache_subdir='data')
-
+data_dir = pathlib.Path('data/otherSounds')
 
 commands = ['right', 'go', 'no', 'left', 'stop', 'up', 'down', 'yes']
 print('Commands:', commands)
@@ -94,7 +87,7 @@ for waveform, label in waveform_ds.take(1):
   spectrogram = get_spectrogram(waveform)
 
 
- #building and training model
+#building and training model
 
 def preprocess_dataset(files):
   files_ds = tf.data.Dataset.from_tensor_slices(files)
@@ -144,7 +137,7 @@ model.compile(
     metrics=['accuracy'],
 )
 
-EPOCHS = 2
+EPOCHS = 10
 history = model.fit(
     train_ds,
     validation_data=val_ds,
@@ -187,6 +180,7 @@ sample_ds = preprocess_dataset([str(sample_file)])
 
 for spectrogram, label in sample_ds.batch(1):
   prediction = model(spectrogram)
+  plt.figure(figsize=(10, 8))
   plt.bar(commands, tf.nn.softmax(prediction[0]))
   plt.title(f'Predictions for "{commands[label[0]]}"')
   plt.savefig("./plots/prediction.png")
