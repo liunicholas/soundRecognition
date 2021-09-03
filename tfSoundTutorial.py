@@ -144,7 +144,7 @@ model.compile(
     metrics=['accuracy'],
 )
 
-EPOCHS = 2
+EPOCHS = 100
 history = model.fit(
     train_ds,
     validation_data=val_ds,
