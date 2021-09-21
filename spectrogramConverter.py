@@ -5,103 +5,144 @@ from scipy.io import wavfile
 import librosa
 import librosa.display
 
+from math import *
+from pandas import *
+
+#https://stackoverflow.com/a/64505498
+def frequency_to_note(frequency):
+    # define constants that control the algorithm
+    NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] # these are the 12 notes in each octave
+    OCTAVE_MULTIPLIER = 2 # going up an octave multiplies by 2
+    KNOWN_NOTE_NAME, KNOWN_NOTE_OCTAVE, KNOWN_NOTE_FREQUENCY = ('A', 4, 440) # A4 = 440 Hz
+
+    # calculate the distance to the known note
+    # since notes are spread evenly, going up a note will multiply by a constant
+    # so we can use log to know how many times a frequency was multiplied to get from the known note to our note
+    # this will give a positive integer value for notes higher than the known note, and a negative value for notes lower than it (and zero for the same note)
+    note_multiplier = OCTAVE_MULTIPLIER**(1/len(NOTES))
+    frequency_relative_to_known_note = frequency / KNOWN_NOTE_FREQUENCY
+    distance_from_known_note = math.log(frequency_relative_to_known_note, note_multiplier)
+
+    # round to make up for floating point inaccuracies
+    distance_from_known_note = round(distance_from_known_note)
+
+    # using the distance in notes and the octave and name of the known note,
+    # we can calculate the octave and name of our note
+    # NOTE: the "absolute index" doesn't have any actual meaning, since it doesn't care what its zero point is. it is just useful for calculation
+    known_note_index_in_octave = NOTES.index(KNOWN_NOTE_NAME)
+    known_note_absolute_index = KNOWN_NOTE_OCTAVE * len(NOTES) + known_note_index_in_octave
+    note_absolute_index = known_note_absolute_index + distance_from_known_note
+    note_octave, note_index_in_octave = note_absolute_index // len(NOTES), note_absolute_index % len(NOTES)
+    note_name = NOTES[note_index_in_octave]
+    return (note_name, note_octave)
+
+def binFreqs(freqs):
+    #lowest frequency of a series of multiples, this is the x value
+    baseFreqs = []
+    #index of the frequencies of harmonic series,
+    harmonicIndexes = []
+    #dictionary for each frequency to which baseFreq
+    harmonicDict = {}
+    for i in range(len(freqs)):
+        ISBASE = False
+        for j in range(len(baseFreqs)):
+            if baseFreqs[j]*1 != 0:
+                if len(baseFreqs)<=12:
+                    errorThreshold = 0.5
+                else:
+                    errorThreshold = 2
+                if freqs[i] % baseFreqs[j] <= errorThreshold:
+                    print(baseFreqs[j])
+                    print(freqs[i])
+                    print(freqs[i] % baseFreqs[j])
+                    harmonicIndexes[j].append(i)
+                    harmonicDict.update({freqs[i]:j})
+                    ISBASE = True
+                    break
+        if ISBASE:
+            continue
+
+        print("Found new base frequency.")
+        baseFreqs.append(freqs[i])
+        harmonicIndexes.append([i])
+        harmonicDict.update({freqs[i]:i})
+
 audioClip = "/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav"
 
-x, sr = librosa.load(audioClip, sr=11025)
-# plt.figure(figsize=(14, 5))
-# librosa.display.waveplot(x, sr=sr)
-# plt.show()
+data = read_csv("freqs.csv")
+freqs = data['Frequency (Hz)'].tolist()
 
-# thing = librosa.feature.melspectrogram(x, sr)
-# print(thing)
-# Nfft = 256
-# stft = librosa.stft(x, n_fft=Nfft, window=sig.windows.hamming)
-# freqs = librosa.fft_frequencies(sr=sr, n_fft=Nfft)
+baseFreqs = [16.351, 17.324, 18.354, 19.445, 20.601, 21.827, 23.124, 24.499, 25.956, 27.5, 29.135, 30.868]
 
-freqs = librosa.fft_frequencies(sr=11025, n_fft=2048)
+allFreqs = []
+for freq in baseFreqs:
+    currentFreqList = []
+    currentFreq = freq
+    addFreq = freq
+    multiple = 2
+    while addFreq < 11025:
+        currentFreqList.append(addFreq)
+        addFreq = currentFreq*multiple
+        multiple+=1
+    allFreqs.append(currentFreqList)
 
-# freqs = librosa.mel_frequencies(n_mels=5512)
-print(len(freqs))
+print(allFreqs)
 
-#lowest frequency of a series of multiples, this is the x value
-baseFreqs = []
-#index of the frequencies of harmonic series,
-harmonicIndexes = []
-#dictionary for each frequency to which baseFreq
-harmonicDict = {}
-for i in range(len(freqs)):
-    ISBASE = False
-    for j in range(len(baseFreqs)):
-        if baseFreqs[j]*1 != 0:
-            if freqs[i] % baseFreqs[j] <= 0:
-                print(baseFreqs[j])
-                print(freqs[i])
-                print(freqs[i] % baseFreqs[j])
-                harmonicIndexes[j].append(i)
-                harmonicDict.update({freqs[i]:j})
-                ISBASE = True
-                break
-    if ISBASE:
-        continue
+def librosaStuff():
+    x, sr = librosa.load(audioClip, sr=11025)
+    plt.figure(figsize=(14, 5))
+    librosa.display.waveplot(x, sr=sr)
+    plt.show()
 
-    print("Found new base frequency.")
-    baseFreqs.append(freqs[i])
-    harmonicIndexes.append([i])
-    harmonicDict.update({freqs[i]:i})
+    thing = librosa.feature.melspectrogram(x, sr)
+    print(thing)
+    Nfft = 256
+    stft = librosa.stft(x, n_fft=Nfft, window=sig.windows.hamming)
+    freqs = librosa.fft_frequencies(sr=sr, n_fft=Nfft)
 
-print(freqs)
+    freqs = librosa.fft_frequencies(sr=11025, n_fft=2048)
 
+    # freqs = librosa.mel_frequencies(n_mels=5512)
+    print(len(freqs))
 
+    X = librosa.stft(x)
+    Xdb = (librosa.amplitude_to_db(abs(X)))
+    plt.figure(figsize=(14, 5))
+    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
+    plt.colorbar()
+    plt.show()
 
-X = librosa.stft(x)
-Xdb = (librosa.amplitude_to_db(abs(X)))
-plt.figure(figsize=(14, 5))
-librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
-plt.colorbar()
-plt.show()
+def sciPySpectrogram():
+    sample_rate, samples = wavfile.read('/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav')
+    frequencies, times, spectrogram = signal.spectrogram(samples, sample_rate)
 
+    print(frequencies)
+    print("frequencies:")
+    print(len(frequencies))
+    print("time:")
+    print(len(times))
+    print("spectrogram:")
+    print(len(spectrogram))
 
-# print(len(Xdb))
-# print(len(Xdb[1]))
-# for i in range(len(Xdb)):
-#     print(Xdb[20])
-# print(Xdb[0][0])
+    plt.pcolormesh(times, frequencies, spectrogram)
+    plt.imshow(spectrogram)
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    plt.show()
 
-# sample_rate, samples = wavfile.read('/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav')
-# frequencies, times, spectrogram = signal.spectrogram(samples, sample_rate)
+def multiDimensionPlotting():
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib.pyplot as plt
+    import numpy as np
 
-# print(frequencies)
-# print("frequencies:")
-# print(len(frequencies))
-# print("time:")
-# print(len(times))
-# print("spectrogram:")
-# print(len(spectrogram))
-#
-# baseFrequency = []
-# harmonicList = []
-#
-# for i in range(len(frequencies)):
-#     if freuqencies[i] not in baseFrequency:
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
 
-# plt.pcolormesh(times, frequencies, spectrogram)
-# plt.imshow(spectrogram)
-# plt.ylabel('Frequency [Hz]')
-# plt.xlabel('Time [sec]')
-# plt.show()
+    x = np.random.standard_normal(100)
+    y = np.random.standard_normal(100)
+    z = np.random.standard_normal(100)
+    c = np.random.standard_normal(100)
 
-# from mpl_toolkits.mplot3d import Axes3D
-# import matplotlib.pyplot as plt
-# import numpy as np
-#
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-#
-# x = np.random.standard_normal(100)
-# y = np.random.standard_normal(100)
-# z = np.random.standard_normal(100)
-# c = np.random.standard_normal(100)
-#
-# img = ax.scatter(x, y, z, c=c, cmap=plt.hot())
-# fig.colorbar(img)
-# plt.show()
+    img = ax.scatter(x, y, z, c=c, cmap=plt.hot())
+    fig.colorbar(img)
+    plt.show()
