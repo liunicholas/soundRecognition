@@ -2,11 +2,14 @@ import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.io import wavfile
 
-import librosa
-import librosa.display
+# import librosa
+# import librosa.display
 
 from math import *
+import numpy as np
 from pandas import *
+
+import scipy.fft as fft
 
 #https://stackoverflow.com/a/64505498
 def frequency_to_note(frequency):
@@ -35,6 +38,66 @@ def frequency_to_note(frequency):
     note_octave, note_index_in_octave = note_absolute_index // len(NOTES), note_absolute_index % len(NOTES)
     note_name = NOTES[note_index_in_octave]
     return (note_name, note_octave)
+def hardCodeFreqs():
+    data = read_csv("freqs.csv")
+    freqs = data['Frequency (Hz)'].tolist()
+
+    baseFreqs = [16.351, 17.324, 18.354, 19.445, 20.601, 21.827, 23.124, 24.499, 25.956, 27.5, 29.135, 30.868]
+
+    allFreqs = []
+    for freq in baseFreqs:
+        currentFreqList = []
+        currentFreq = freq
+        addFreq = freq
+        multiple = 2
+        while addFreq < 11025:
+            currentFreqList.append(addFreq)
+            addFreq = currentFreq*multiple
+            multiple+=1
+        allFreqs.append(currentFreqList)
+
+    print(allFreqs[0])
+def librosaStuff(audioClip):
+    x, sr = librosa.load(audioClip, sr=11025)
+    x = x[:sr]
+    plt.figure(figsize=(14, 5))
+    librosa.display.waveplot(x, sr=sr)
+    # plt.show()
+
+    thing = librosa.feature.melspectrogram(x, sr)
+    print(thing)
+    Nfft = 256
+    stft = librosa.stft(x, n_fft=Nfft, window=sig.windows.hamming)
+    freqs = librosa.fft_frequencies(sr=sr, n_fft=Nfft)
+    #
+    # freqs = librosa.fft_frequencies(sr=11025, n_fft=2048)
+
+    # freqs = librosa.mel_frequencies(n_mels=5512)
+    print(len(freqs))
+
+    X = librosa.stft(x)
+    Xdb = (librosa.amplitude_to_db(abs(X)))
+    plt.figure(figsize=(14, 5))
+    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
+    plt.colorbar()
+    # plt.show()
+def multiDimensionPlotting():
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    x = np.random.standard_normal(100)
+    y = np.random.standard_normal(100)
+    z = np.random.standard_normal(100)
+    c = np.random.standard_normal(100)
+
+    img = ax.scatter(x, y, z, c=c, cmap=plt.hot())
+    fig.colorbar(img)
+    plt.show()
+
 
 def binFreqs(freqs):
     #lowest frequency of a series of multiples, this is the x value
@@ -69,56 +132,18 @@ def binFreqs(freqs):
 
 audioClip = "/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav"
 
-data = read_csv("freqs.csv")
-freqs = data['Frequency (Hz)'].tolist()
-
-baseFreqs = [16.351, 17.324, 18.354, 19.445, 20.601, 21.827, 23.124, 24.499, 25.956, 27.5, 29.135, 30.868]
-
-allFreqs = []
-for freq in baseFreqs:
-    currentFreqList = []
-    currentFreq = freq
-    addFreq = freq
-    multiple = 2
-    while addFreq < 11025:
-        currentFreqList.append(addFreq)
-        addFreq = currentFreq*multiple
-        multiple+=1
-    allFreqs.append(currentFreqList)
-
-print(allFreqs)
-
-def librosaStuff():
-    x, sr = librosa.load(audioClip, sr=11025)
-    plt.figure(figsize=(14, 5))
-    librosa.display.waveplot(x, sr=sr)
-    plt.show()
-
-    thing = librosa.feature.melspectrogram(x, sr)
-    print(thing)
-    Nfft = 256
-    stft = librosa.stft(x, n_fft=Nfft, window=sig.windows.hamming)
-    freqs = librosa.fft_frequencies(sr=sr, n_fft=Nfft)
-
-    freqs = librosa.fft_frequencies(sr=11025, n_fft=2048)
-
-    # freqs = librosa.mel_frequencies(n_mels=5512)
-    print(len(freqs))
-
-    X = librosa.stft(x)
-    Xdb = (librosa.amplitude_to_db(abs(X)))
-    plt.figure(figsize=(14, 5))
-    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
-    plt.colorbar()
-    plt.show()
-
-def sciPySpectrogram():
+def sciPySpectrogram(audioClip):
     sample_rate, samples = wavfile.read('/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav')
-    frequencies, times, spectrogram = signal.spectrogram(samples, sample_rate)
+    print(len(samples))
+    sampleList = []
+    for i in range(samples.size//sample_rate):
+        sampleList.append(samples[:sample_rate])
+        samples = samples[sample_rate+1:]
+    # print(len(sampleList[0]))
+    frequencies, times, spectrogram = signal.spectrogram(sampleList[0], fs = 1/len(sampleList[0]))
 
-    print(frequencies)
     print("frequencies:")
-    print(len(frequencies))
+    print(frequencies)
     print("time:")
     print(len(times))
     print("spectrogram:")
@@ -130,19 +155,30 @@ def sciPySpectrogram():
     plt.xlabel('Time [sec]')
     plt.show()
 
-def multiDimensionPlotting():
-    from mpl_toolkits.mplot3d import Axes3D
-    import matplotlib.pyplot as plt
-    import numpy as np
+def scipyFFT(audioClip):
+    sample_rate, samples = wavfile.read('/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav')
+    # print(len(samples))
+    sampleList = []
+    for i in range(samples.size//sample_rate):
+        sampleList.append(samples[:sample_rate])
+        samples = samples[sample_rate+1:]
+    freq = fft.fftfreq(11025,1/11025)
+    fftResult = fft.fft(sampleList[0])
+    fftFixed = []
+    for val in fftResult[:5012]:
+        fftFixed.append(abs(val))
+    # print(max(fftFixed))
+    # print(min(fftFixed))
+    for i, val in enumerate(fftFixed):
+        fftFixed[i]=val/max(fftFixed)
+    for i, val in enumerate(fftFixed):
+        if val > 0.95:
+            print(i)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
 
-    x = np.random.standard_normal(100)
-    y = np.random.standard_normal(100)
-    z = np.random.standard_normal(100)
-    c = np.random.standard_normal(100)
 
-    img = ax.scatter(x, y, z, c=c, cmap=plt.hot())
-    fig.colorbar(img)
-    plt.show()
+
+
+# sciPySpectrogram(audioClip)
+scipyFFT(audioClip)
+# librosaStuff(audioClip)
