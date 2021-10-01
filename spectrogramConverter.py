@@ -155,7 +155,7 @@ def binFreqs(freqs):
     return baseFreqs, harmonicIndexes, harmonicDict
 
 def readWavFile(audioClip):
-    sample_rate, samples = wavfile.read('/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav')
+    sample_rate, samples = wavfile.read(audioClip)
     return sample_rate, samples
 
 def getFreqs(sample_rate):
