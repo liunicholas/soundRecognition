@@ -190,7 +190,7 @@ def main():
     times = []
     time = 0.0
     spectrogramList = []
-    for i in range((samples.size-sample_rate)//interval - 1):
+    for i in range((samples.size-sample_rate)//interval):
         sample = samples[i*interval:i*interval+sample_rate]
         fftFixed = getScipyFFT(sample)
         spectrogramList.append(fftFixed)
@@ -199,6 +199,9 @@ def main():
         time += interval/sample_rate
         print(i)
 
+    print(f"times: {len(times)}")
+    print(f"frequencies: {len(frequencies)}")
+    print(f"spectrogramListOneList: {len(spectrogramList[0]}")
     plt.pcolormesh(times, frequencies, spectrogramList)
     plt.imshow(spectrogram)
     plt.ylabel('Frequency [Hz]')
