@@ -201,7 +201,7 @@ def main():
 
     print(f"times: {len(times)}")
     print(f"frequencies: {len(frequencies)}")
-    print(f"spectrogramListOneList: {len(spectrogramList[0]}")
+    print(f"spectrogramListOneList: {len(spectrogramList[0])}")
     plt.pcolormesh(times, frequencies, spectrogramList)
     plt.imshow(spectrogram)
     plt.ylabel('Frequency [Hz]')
