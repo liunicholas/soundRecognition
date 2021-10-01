@@ -11,6 +11,69 @@ from pandas import *
 
 import scipy.fft as fft
 
+def librosaStuff(audioClip):
+    x, sr = librosa.load(audioClip, sr=11025)
+    x = x[:sr]
+    plt.figure(figsize=(14, 5))
+    librosa.display.waveplot(x, sr=sr)
+    # plt.show()
+
+    thing = librosa.feature.melspectrogram(x, sr)
+    print(thing)
+    Nfft = 256
+    stft = librosa.stft(x, n_fft=Nfft, window=sig.windows.hamming)
+    freqs = librosa.fft_frequencies(sr=sr, n_fft=Nfft)
+    #
+    # freqs = librosa.fft_frequencies(sr=11025, n_fft=2048)
+
+    # freqs = librosa.mel_frequencies(n_mels=5512)
+    print(len(freqs))
+
+    X = librosa.stft(x)
+    Xdb = (librosa.amplitude_to_db(abs(X)))
+    plt.figure(figsize=(14, 5))
+    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
+    plt.colorbar()
+    # plt.show()
+def multiDimensionPlotting():
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    x = np.random.standard_normal(100)
+    y = np.random.standard_normal(100)
+    z = np.random.standard_normal(100)
+    c = np.random.standard_normal(100)
+
+    img = ax.scatter(x, y, z, c=c, cmap=plt.hot())
+    fig.colorbar(img)
+    plt.show()
+def sciPySpectrogram(audioClip):
+    sample_rate, samples = wavfile.read('/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav')
+    print(len(samples))
+    sampleList = []
+    for i in range(samples.size//sample_rate):
+        sampleList.append(samples[:sample_rate])
+        samples = samples[sample_rate+1:]
+    # print(len(sampleList[0]))
+    frequencies, times, spectrogram = signal.spectrogram(sampleList[0], fs = 1/len(sampleList[0]))
+
+    print("frequencies:")
+    print(frequencies)
+    print("time:")
+    print(len(times))
+    print("spectrogram:")
+    print(len(spectrogram))
+
+    plt.pcolormesh(times, frequencies, spectrogram)
+    plt.imshow(spectrogram)
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    plt.show()
+
 #https://stackoverflow.com/a/64505498
 def frequency_to_note(frequency):
     # define constants that control the algorithm
@@ -57,48 +120,6 @@ def hardCodeFreqs():
         allFreqs.append(currentFreqList)
 
     print(allFreqs[0])
-def librosaStuff(audioClip):
-    x, sr = librosa.load(audioClip, sr=11025)
-    x = x[:sr]
-    plt.figure(figsize=(14, 5))
-    librosa.display.waveplot(x, sr=sr)
-    # plt.show()
-
-    thing = librosa.feature.melspectrogram(x, sr)
-    print(thing)
-    Nfft = 256
-    stft = librosa.stft(x, n_fft=Nfft, window=sig.windows.hamming)
-    freqs = librosa.fft_frequencies(sr=sr, n_fft=Nfft)
-    #
-    # freqs = librosa.fft_frequencies(sr=11025, n_fft=2048)
-
-    # freqs = librosa.mel_frequencies(n_mels=5512)
-    print(len(freqs))
-
-    X = librosa.stft(x)
-    Xdb = (librosa.amplitude_to_db(abs(X)))
-    plt.figure(figsize=(14, 5))
-    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
-    plt.colorbar()
-    # plt.show()
-def multiDimensionPlotting():
-    from mpl_toolkits.mplot3d import Axes3D
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    x = np.random.standard_normal(100)
-    y = np.random.standard_normal(100)
-    z = np.random.standard_normal(100)
-    c = np.random.standard_normal(100)
-
-    img = ax.scatter(x, y, z, c=c, cmap=plt.hot())
-    fig.colorbar(img)
-    plt.show()
-
-
 def binFreqs(freqs):
     #lowest frequency of a series of multiples, this is the x value
     baseFreqs = []
@@ -110,10 +131,11 @@ def binFreqs(freqs):
         ISBASE = False
         for j in range(len(baseFreqs)):
             if baseFreqs[j]*1 != 0:
-                if len(baseFreqs)<=12:
-                    errorThreshold = 0.5
-                else:
-                    errorThreshold = 2
+                # if len(baseFreqs)<=12:
+                #     errorThreshold = 0.5
+                # else:
+                #     errorThreshold = 2
+                errorThreshold = 0.5
                 if freqs[i] % baseFreqs[j] <= errorThreshold:
                     print(baseFreqs[j])
                     print(freqs[i])
@@ -130,40 +152,18 @@ def binFreqs(freqs):
         harmonicIndexes.append([i])
         harmonicDict.update({freqs[i]:i})
 
-audioClip = "/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav"
+    return baseFreqs, harmonicIndexes, harmonicDict
 
-def sciPySpectrogram(audioClip):
+def readWavFile(audioClip):
     sample_rate, samples = wavfile.read('/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav')
-    print(len(samples))
-    sampleList = []
-    for i in range(samples.size//sample_rate):
-        sampleList.append(samples[:sample_rate])
-        samples = samples[sample_rate+1:]
-    # print(len(sampleList[0]))
-    frequencies, times, spectrogram = signal.spectrogram(sampleList[0], fs = 1/len(sampleList[0]))
+    return sample_rate, samples
 
-    print("frequencies:")
-    print(frequencies)
-    print("time:")
-    print(len(times))
-    print("spectrogram:")
-    print(len(spectrogram))
+def getFreqs(sample_rate):
+    freqs = fft.fftfreq(sample_rate,1/sample_rate)
+    return freqs[:5012]
 
-    plt.pcolormesh(times, frequencies, spectrogram)
-    plt.imshow(spectrogram)
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [sec]')
-    plt.show()
-
-def scipyFFT(audioClip):
-    sample_rate, samples = wavfile.read('/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav')
-    # print(len(samples))
-    sampleList = []
-    for i in range(samples.size//sample_rate):
-        sampleList.append(samples[:sample_rate])
-        samples = samples[sample_rate+1:]
-    freq = fft.fftfreq(11025,1/11025)
-    fftResult = fft.fft(sampleList[0])
+def getScipyFFT(sample):
+    fftResult = fft.fft(sample)
     fftFixed = []
     for val in fftResult[:5012]:
         fftFixed.append(abs(val))
@@ -171,14 +171,28 @@ def scipyFFT(audioClip):
     # print(min(fftFixed))
     for i, val in enumerate(fftFixed):
         fftFixed[i]=val/max(fftFixed)
-    for i, val in enumerate(fftFixed):
-        if val > 0.95:
-            print(i)
+    # for i, val in enumerate(fftFixed):
+    #     if val > 0.95:
+    #         print(i)
+
+    return fftFixed
+
+def main():
+    audioClip = "/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav"
+    sample_rate, samples = readWavFile(audioClip)
+
+    freqs = getFreqs(sample_rate)
+    print(f"frequencies:{freqs}")
+    baseFreqs, harmonicIndexes, harmonicDict = binFreqs(freqs)
+
+    print(baseFreqs)
+
+    spectrogramList = []
+    for i in range(samples.size-sample_rate):
+        sample = samples[i:i+sample_rate]
+        fftFixed = getScipyFFT(sample)
+        spectrogramList.append(fftFixed)
 
 
 
-
-
-# sciPySpectrogram(audioClip)
-scipyFFT(audioClip)
-# librosaStuff(audioClip)
+main()
