@@ -190,7 +190,7 @@ def main():
     times = []
     time = 0.0
     spectrogramList = []
-    for i in range((samples.size-sample_rate)//interval):
+    for i in range((samples.size-sample_rate-1)//interval):
         sample = samples[i*interval:i*interval+sample_rate]
         fftFixed = getScipyFFT(sample)
         spectrogramList.append(fftFixed)
