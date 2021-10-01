@@ -178,6 +178,7 @@ def getScipyFFT(sample):
     return fftFixed
 
 def main():
+    interval = 441
     audioClip = "violin-C4.wav"
     sample_rate, samples = readWavFile(audioClip)
 
@@ -189,13 +190,13 @@ def main():
     times = []
     time = 0.0
     spectrogramList = []
-    for i in range(samples.size-sample_rate):
-        sample = samples[i:i+sample_rate]
+    for i in range((samples.size-sample_rate)//interval):
+        sample = samples[i*interval:i*interval+sample_rate]
         fftFixed = getScipyFFT(sample)
         spectrogramList.append(fftFixed)
 
         times.append(time)
-        time += 1/sample_rate
+        time += interval/sample_rate
         print(i)
 
     plt.pcolormesh(times, frequencies, spectrogramList)
