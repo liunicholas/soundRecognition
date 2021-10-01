@@ -178,7 +178,7 @@ def getScipyFFT(sample):
     return fftFixed
 
 def main():
-    audioClip = "/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav"
+    audioClip = "violin-C4.wav"
     sample_rate, samples = readWavFile(audioClip)
 
     frequencies = getFreqs(sample_rate)
@@ -202,7 +202,8 @@ def main():
     plt.imshow(spectrogram)
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
-    plt.show()
+    # plt.show()
+    plt.savefig("./plots/spectrogram.png")
 
 
 
