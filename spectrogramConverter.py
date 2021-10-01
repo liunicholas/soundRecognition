@@ -181,17 +181,30 @@ def main():
     audioClip = "/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav"
     sample_rate, samples = readWavFile(audioClip)
 
-    freqs = getFreqs(sample_rate)
-    print(f"frequencies:{freqs}")
-    baseFreqs, harmonicIndexes, harmonicDict = binFreqs(freqs)
-
+    frequencies = getFreqs(sample_rate)
+    print(f"frequencies:{frequencies}")
+    baseFreqs, harmonicIndexes, harmonicDict = binFreqs(frequencies)
     print(baseFreqs)
 
+    times = []
+    time = 0.0
     spectrogramList = []
     for i in range(samples.size-sample_rate):
         sample = samples[i:i+sample_rate]
         fftFixed = getScipyFFT(sample)
         spectrogramList.append(fftFixed)
+
+        times.append(time)
+        time += 1/sample_rate
+        print(i)
+
+    plt.pcolormesh(times, frequencies, spectrogramList)
+    plt.imshow(spectrogram)
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    plt.show()
+
+
 
 
 
