@@ -200,10 +200,10 @@ def main():
         print(i)
 
     print(f"times: {len(times)}")
-    print(f"frequencies: {len(frequencies)}")
+    print(f"frequencies: {len(frequencie}")
     print(f"spectrogramListOneList: {len(spectrogramList[0])}")
-    plt.pcolor(X=times, Y=frequencies, C=spectrogramList)
-    # plt.imshow(spectrogram)
+    plt.pcolor(times, frequencies, spectrogramList)
+    plt.imshow(spectrogramList)
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
     # plt.show()
