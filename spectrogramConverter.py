@@ -1,45 +1,17 @@
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from scipy import signal
 from scipy.io import wavfile
 
-# import librosa
-# import librosa.display
-
 from math import *
 import numpy as np
-# from pandas import *
 
+from multiprocessing import Pool
 import scipy.fft as fft
 
-def librosaStuff(audioClip):
-    x, sr = librosa.load(audioClip, sr=11025)
-    x = x[:sr]
-    plt.figure(figsize=(14, 5))
-    librosa.display.waveplot(x, sr=sr)
-    # plt.show()
+fftCount = 0
 
-    thing = librosa.feature.melspectrogram(x, sr)
-    print(thing)
-    Nfft = 256
-    stft = librosa.stft(x, n_fft=Nfft, window=sig.windows.hamming)
-    freqs = librosa.fft_frequencies(sr=sr, n_fft=Nfft)
-    #
-    # freqs = librosa.fft_frequencies(sr=11025, n_fft=2048)
-
-    # freqs = librosa.mel_frequencies(n_mels=5512)
-    print(len(freqs))
-
-    X = librosa.stft(x)
-    Xdb = (librosa.amplitude_to_db(abs(X)))
-    plt.figure(figsize=(14, 5))
-    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
-    plt.colorbar()
-    # plt.show()
 def multiDimensionPlotting():
-    from mpl_toolkits.mplot3d import Axes3D
-    import matplotlib.pyplot as plt
-    import numpy as np
-
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
@@ -51,6 +23,7 @@ def multiDimensionPlotting():
     img = ax.scatter(x, y, z, c=c, cmap=plt.hot())
     fig.colorbar(img)
     plt.show()
+
 def sciPySpectrogram(audioClip):
     sample_rate, samples = wavfile.read('/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav')
     print(len(samples))
@@ -163,6 +136,7 @@ def getFreqs(sample_rate):
     return freqs[:5012]
 
 def getScipyFFT(sample):
+    global fftCount
     fftResult = fft.fft(sample)
     fftFixed = []
     for val in fftResult[:5012]:
@@ -175,12 +149,17 @@ def getScipyFFT(sample):
     #     if val > 0.95:
     #         print(i)
 
+    print(fftCount)
+    fftCount+=1
+
     return fftFixed
 
 def main():
     interval = 441           #number of samples to use per fft
     audioClip = "violin-C4.wav"
     sample_rate, samples = readWavFile(audioClip)
+
+    # sciPySpectrogram(audioClip)
 
     frequencies = getFreqs(sample_rate)
     print(f"frequencies:{frequencies}")
@@ -189,15 +168,21 @@ def main():
 
     times = []
     time = 0.0
-    spectrogramList = []
+    sampleList = []
     for i in range((samples.size-sample_rate)//interval):
         sample = samples[i*interval:i*interval+sample_rate]
-        fftFixed = getScipyFFT(sample)
-        spectrogramList.append(fftFixed)
+        sampleList.append(sample)
 
         times.append(time)
         time += interval/sample_rate
-        print(i)
+
+    with Pool(processes=4, maxtasksperchild = 1) as pool:
+            spectrogramList = pool.map(getScipyFFT, sampleList)
+            pool.close()
+            pool.join()
+
+    # print(spectrogramList)
+    # stop = input("enter something to continue")
 
     times = np.array(times)
     frequencies = np.array(frequencies)
@@ -214,4 +199,6 @@ def main():
     # plt.show()
     plt.savefig("./plots/spectrogram.png")
 
-main()
+#must use this for multitprocessing
+if __name__ == '__main__':
+	main()
