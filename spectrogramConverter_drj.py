@@ -52,7 +52,7 @@ def multiDimensionPlotting():
     fig.colorbar(img)
     plt.show()
 def sciPySpectrogram(audioClip):
-    sample_rate, samples = wavfile.read('/Users/nicholasliu/Documents/adhoncs/soundRecognition/violin-C4.wav')
+    sample_rate, samples = wavfile.read(audioClip)
     print(len(samples))
     sampleList = []
     for i in range(samples.size//sample_rate):
@@ -62,13 +62,13 @@ def sciPySpectrogram(audioClip):
     frequencies, times, spectrogram = signal.spectrogram(sampleList[0], fs = 1/len(sampleList[0]))
 
     print("frequencies:")
-    print(frequencies)
+    print(frequencies.shape)
     print("time:")
-    print(len(times))
+    print(times.shape)
     print("spectrogram:")
-    print(len(spectrogram))
+    print(spectrogram.shape)
 
-    plt.pcolormesh(times, frequencies, spectrogram)
+    plt.pcolormesh(times, frequencies, spectrogram, shading = 'auto')
     plt.imshow(spectrogram)
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
@@ -137,9 +137,9 @@ def binFreqs(freqs):
                 #     errorThreshold = 2
                 errorThreshold = 0.5
                 if freqs[i] % baseFreqs[j] <= errorThreshold:
-                    print(baseFreqs[j])
-                    print(freqs[i])
-                    print(freqs[i] % baseFreqs[j])
+                    # print(baseFreqs[j])
+                    # print(freqs[i])
+                    # print(freqs[i] % baseFreqs[j])
                     harmonicIndexes[j].append(i)
                     harmonicDict.update({freqs[i]:j})
                     ISBASE = True
@@ -178,14 +178,16 @@ def getScipyFFT(sample):
     return fftFixed
 
 def main():
-    interval = 441           #number of samples to use per fft
+    interval = 441
     audioClip = "violin-C4.wav"
     sample_rate, samples = readWavFile(audioClip)
 
     frequencies = getFreqs(sample_rate)
-    print(f"frequencies:{frequencies}")
-    # baseFreqs, harmonicIndexes, harmonicDict = binFreqs(frequencies)
+    # print(f"frequencies:{frequencies}")
+    baseFreqs, harmonicIndexes, harmonicDict = binFreqs(frequencies)
     # print(baseFreqs)
+
+    # sciPySpectrogram(audioClip)
 
     times = []
     time = 0.0
@@ -197,7 +199,7 @@ def main():
 
         times.append(time)
         time += interval/sample_rate
-        print(i)
+        if i % 10 == 0: print(i)
 
     times = np.array(times)
     frequencies = np.array(frequencies)
@@ -208,10 +210,14 @@ def main():
     print(f"frequencies: {frequencies.shape}")
     print(f"spectrogramList: {specArray.shape}")
     plt.pcolormesh(times, frequencies, specArray)
-    # plt.imshow(spectrogramList)
+    # plt.imshow(spectrogram)
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
     # plt.show()
     plt.savefig("./plots/spectrogram.png")
+
+
+
+
 
 main()
