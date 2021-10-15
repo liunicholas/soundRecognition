@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from scipy import signal
 from scipy.io import wavfile
 
 from math import *
@@ -11,25 +10,27 @@ import scipy.fft as fft
 
 fftCount = 0
 
-def hardCodeFreqs():
-    data = read_csv("freqs.csv")
-    freqs = data['Frequency (Hz)'].tolist()
+def hardCodeFreqs(baseFreqs):
+    # data = read_csv("freqs.csv")
+    # freqs = data['Frequency (Hz)'].tolist()
 
-    baseFreqs = [16.351, 17.324, 18.354, 19.445, 20.601, 21.827, 23.124, 24.499, 25.956, 27.5, 29.135, 30.868]
+    # baseFreqs = [16.351, 17.324, 18.354, 19.445, 20.601, 21.827, 23.124, 24.499, 25.956, 27.5, 29.135, 30.868]
 
-    allFreqs = []
+    binnedFreqs = []
     for freq in baseFreqs:
         currentFreqList = []
         currentFreq = freq
         addFreq = freq
         multiple = 2
-        while addFreq < 11025:
+        while addFreq < 5012:
             currentFreqList.append(addFreq)
             addFreq = currentFreq*multiple
             multiple+=1
-        allFreqs.append(currentFreqList)
+        binnedFreqs.append(currentFreqList)
 
-    print(allFreqs[0])
+    # print(binnedFreqs[0])
+
+    return binnedFreqs
 
 def readWavFile(audioClip):
     sample_rate, samples = wavfile.read(audioClip)
@@ -68,14 +69,17 @@ def getScipyFFT(sample):
     return fftFixed
 
 def plotSpectrogram(times, frequencies, specArray):
+    specArray = np.transpose(specArray)
+
     print(f"times: {times.shape}")
     print(f"frequencies: {frequencies.shape}")
     print(f"spectrogramList: {specArray.shape}")
     plt.pcolormesh(times, frequencies, specArray)
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
-    plt.show()
+
     plt.savefig("./plots/spectrogram.png")
+    plt.show()
 
 def multiDimensionPlotting(x, y, z, c):
     fig = plt.figure()
@@ -83,6 +87,8 @@ def multiDimensionPlotting(x, y, z, c):
 
     img = ax.scatter(x, y, z, c=c, cmap=plt.hot())
     fig.colorbar(img)
+
+    plt.savefig("./plots/multiDimensionSpectrogram.png")
     plt.show()
 
 def main():
@@ -102,9 +108,24 @@ def main():
     times = np.array(times)
     frequencies = np.array(frequencies)
     specArray = np.array(spectrogramList)
-    specArray = np.transpose(specArray)
 
-    plotSpectrogram(times, frequencies, specArray)
+    # plotSpectrogram(times, frequencies, specArray)
+
+    baseFreqs = range(100,200)
+    binnedFreqs = hardCodeFreqs(baseFreqs)
+
+    x, y, z, c = [], [], [], []
+    onePart = specArray[0]
+    for i in range(len(onePart)):
+        for j in range(len(binnedFreqs)):
+            for k in range(len(binnedFreqs[j])):
+                if i == binnedFreqs[j][k]:
+                    x.append(0)
+                    y.append(baseFreqs[j])
+                    z.append(k)
+                    c.append(specArray[0][i])
+
+    multiDimensionPlotting(x,y,z,c)
 
 #must use this for multitprocessing
 if __name__ == '__main__':
