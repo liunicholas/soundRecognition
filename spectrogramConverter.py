@@ -93,7 +93,8 @@ def multiDimensionPlotting(x, y, z, c):
 
 def main():
     interval = 441           #number of samples to use per fft
-    audioClip = "violin-C4.wav"
+    # audioClip = "violin-C4.wav"
+    audioClip = "sine.wav"
     sample_rate, samples = readWavFile(audioClip)
 
     frequencies = getFreqs(sample_rate)
