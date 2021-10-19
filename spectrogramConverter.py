@@ -100,6 +100,7 @@ def main():
     frequencies = getFreqs(sample_rate)
     print(f"frequencies:{frequencies}")
 
+    #gets groups of samples and the times that each sample starts at
     times, sampleList = getTimesAndSamples(samples, sample_rate, interval)
     with Pool(processes=8, maxtasksperchild = 1) as pool:
             spectrogramList = pool.map(getScipyFFT, sampleList)
@@ -110,9 +111,11 @@ def main():
     frequencies = np.array(frequencies)
     specArray = np.array(spectrogramList)
 
+    # plots spectrogram
     # plotSpectrogram(times, frequencies, specArray)
 
     baseFreqs = range(100,200)
+    #bin frequncies using base frequencies 
     binnedFreqs = hardCodeFreqs(baseFreqs)
 
     x, y, z, c = [], [], [], []
