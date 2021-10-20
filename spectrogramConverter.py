@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import animation
 from scipy.io import wavfile
 
 from math import *
@@ -8,7 +9,7 @@ import numpy as np
 from multiprocessing import Pool
 import scipy.fft as fft
 
-fftCount = 0
+# fftCount = 0
 
 def hardCodeFreqs(baseFreqs):
     # data = read_csv("freqs.csv")
@@ -54,7 +55,7 @@ def getTimesAndSamples(samples, sample_rate, interval):
     return times, sampleList
 
 def getScipyFFT(sample):
-    global fftCount
+    # global fftCount
     fftResult = fft.fft(sample)
     fftFixed = []
     for val in fftResult[:5012]:
@@ -63,23 +64,37 @@ def getScipyFFT(sample):
     for i, val in enumerate(fftFixed):
         fftFixed[i]=val/max(fftFixed)
 
-    print(fftCount)
-    fftCount+=1
+    # print(fftCount)
+    # fftCount+=1
 
     return fftFixed
 
 def plotSpectrogram(times, frequencies, specArray):
-    specArray = np.transpose(specArray)
+    specArrayT = np.transpose(specArray)
 
     print(f"times: {times.shape}")
     print(f"frequencies: {frequencies.shape}")
-    print(f"spectrogramList: {specArray.shape}")
-    plt.pcolormesh(times, frequencies, specArray)
+    print(f"spectrogramList: {specArrayT.shape}")
+    plt.pcolormesh(times, frequencies, specArrayT)
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
 
     plt.savefig("./plots/spectrogram.png")
     plt.show()
+
+def getBinnedSpectrogram(oneInterval, index, x, y, z, c, binnedFreqs, baseFreqs, times):
+    # x, y, z, c = [], [], [], []
+    for i in range(len(oneInterval)):
+        for j in range(len(binnedFreqs)):
+            for k in range(len(binnedFreqs[j])):
+                if i == binnedFreqs[j][k]:
+                    x.append(times[index])
+                    y.append(baseFreqs[j])
+                    z.append(k)
+                    c.append(oneInterval[i])
+
+    print(f"finished interval {index}")
+    # return x, y, z, c
 
 def multiDimensionPlotting(x, y, z, c):
     fig = plt.figure()
@@ -97,12 +112,15 @@ def main():
     audioClip = "sine.wav"
     sample_rate, samples = readWavFile(audioClip)
 
+    print("getting frequencies")
     frequencies = getFreqs(sample_rate)
     print(f"frequencies:{frequencies}")
 
     #gets groups of samples and the times that each sample starts at
     times, sampleList = getTimesAndSamples(samples, sample_rate, interval)
+    print("made times and sample list")
     with Pool(processes=8, maxtasksperchild = 1) as pool:
+            print("making fft for samples")
             spectrogramList = pool.map(getScipyFFT, sampleList)
             pool.close()
             pool.join()
@@ -114,21 +132,34 @@ def main():
     # plots spectrogram
     # plotSpectrogram(times, frequencies, specArray)
 
+    print("making base and binned frequencies")
     baseFreqs = range(100,200)
-    #bin frequncies using base frequencies 
+    #bin frequncies using base frequencies
     binnedFreqs = hardCodeFreqs(baseFreqs)
 
-    x, y, z, c = [], [], [], []
-    onePart = specArray[0]
-    for i in range(len(onePart)):
-        for j in range(len(binnedFreqs)):
-            for k in range(len(binnedFreqs[j])):
-                if i == binnedFreqs[j][k]:
-                    x.append(0)
-                    y.append(baseFreqs[j])
-                    z.append(k)
-                    c.append(specArray[0][i])
+    # with Pool(processes=8, maxtasksperchild = 1) as pool:
+    #         results = pool.map(getBinnedSpectrogram, specArray)
+    #         pool.close()
+    #         pool.join()
+    #
+    # print(listResults)
 
+    print("creating 3d spectrogram at each interval")
+    x, y, z, c = [], [], [], []
+    for index in range(len(specArray)):
+        getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
+
+    # onePart = specArray[0]
+    # for i in range(len(onePart)):
+    #     for j in range(len(binnedFreqs)):
+    #         for k in range(len(binnedFreqs[j])):
+    #             if i == binnedFreqs[j][k]:
+    #                 x.append(0)
+    #                 y.append(baseFreqs[j])
+    #                 z.append(k)
+    #                 c.append(specArray[0][i])
+
+    # x, y, z, c = listResults[0], listResults[1], listResults[2], listResults[3]
     multiDimensionPlotting(x,y,z,c)
 
 #must use this for multitprocessing
