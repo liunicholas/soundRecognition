@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import animation
+from matplotlib.animation import FuncAnimation
 from scipy.io import wavfile
 
 from math import *
@@ -32,15 +32,12 @@ def hardCodeFreqs(baseFreqs):
     # print(binnedFreqs[0])
 
     return binnedFreqs
-
 def readWavFile(audioClip):
     sample_rate, samples = wavfile.read(audioClip)
     return sample_rate, samples
-
 def getFreqs(sample_rate):
     freqs = fft.fftfreq(sample_rate,1/sample_rate)
     return freqs[:5012]
-
 def getTimesAndSamples(samples, sample_rate, interval):
     times = []
     time = 0.0
@@ -53,7 +50,6 @@ def getTimesAndSamples(samples, sample_rate, interval):
         time += interval/sample_rate
 
     return times, sampleList
-
 def getScipyFFT(sample):
     # global fftCount
     fftResult = fft.fft(sample)
@@ -68,7 +64,6 @@ def getScipyFFT(sample):
     # fftCount+=1
 
     return fftFixed
-
 def plotSpectrogram(times, frequencies, specArray):
     specArrayT = np.transpose(specArray)
 
@@ -94,7 +89,6 @@ def getBinnedSpectrogram(oneInterval, index, x, y, z, c, binnedFreqs, baseFreqs,
                     c.append(oneInterval[i])
 
     print(f"finished interval {index}")
-    # return x, y, z, c
 
 def multiDimensionPlotting(x, y, z, c):
     fig = plt.figure()
@@ -104,6 +98,33 @@ def multiDimensionPlotting(x, y, z, c):
     fig.colorbar(img)
 
     plt.savefig("./plots/multiDimensionSpectrogram.png")
+    plt.show()
+
+def getOneSpectrogram(testParams):
+    oneInterval, index, binnedFreqs, baseFreqs, times = testParams[0], testParams[1], testParams[2], testParams[3], testParams[4]
+    x, y, z, c = [], [], [], []
+    for i in range(len(oneInterval)):
+        for j in range(len(binnedFreqs)):
+            for k in range(len(binnedFreqs[j])):
+                if i == binnedFreqs[j][k]:
+                    x.append(times[index])
+                    y.append(baseFreqs[j])
+                    z.append(k)
+                    c.append(oneInterval[i])
+
+    return([x,y,z,c])
+
+def init():
+    return threeDeeSpectrogram[0]
+
+def animate(i):
+    return threeDeeSpectrogram[i]
+
+def animationFunction(threeDeeSpectrogram):
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    anim = FuncAnimation(fig, animate, init_func=init,
+        frames=len(threeDeeSpectrogram), interval=20, blit=False)
     plt.show()
 
 def main():
@@ -137,30 +158,42 @@ def main():
     #bin frequncies using base frequencies
     binnedFreqs = hardCodeFreqs(baseFreqs)
 
-    # with Pool(processes=8, maxtasksperchild = 1) as pool:
-    #         results = pool.map(getBinnedSpectrogram, specArray)
-    #         pool.close()
-    #         pool.join()
-    #
-    # print(listResults)
+    # x, y, z, c = [], [], [], []
+    # plot every frame at once
+    # for index in range(len(specArray)):
+    #     getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
 
     print("creating 3d spectrogram at each interval")
-    x, y, z, c = [], [], [], []
+    spectrogramGroupings = []
     for index in range(len(specArray)):
-        getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
+        oneGroup = []
+        oneGroup.append(specArray[index])
+        oneGroup.append(index)
+        oneGroup.append(binnedFreqs)
+        oneGroup.append(baseFreqs)
+        oneGroup.append(times)
+        spectrogramGroupings.append(oneGroup)
 
-    # onePart = specArray[0]
-    # for i in range(len(onePart)):
-    #     for j in range(len(binnedFreqs)):
-    #         for k in range(len(binnedFreqs[j])):
-    #             if i == binnedFreqs[j][k]:
-    #                 x.append(0)
-    #                 y.append(baseFreqs[j])
-    #                 z.append(k)
-    #                 c.append(specArray[0][i])
+    # print(spectrogramGroupings)
+
+    global threeDeeSpectrogram
+    with Pool(processes=8, maxtasksperchild = 1) as pool:
+            threeDeeSpectrogram = pool.map(getOneSpectrogram, spectrogramGroupings)
+            pool.close()
+            pool.join()
+
+    # print(threeDeeSpectrogram)
+    animationFunction(threeDeeSpectrogram)
+
+    # threeDeeSpectrogram = []
+    # for index in range(len(specArray)):
+    #     threeDeeSpectrogram.append(getOneSpectrogram(specArray[index], index, binnedFreqs, baseFreqs, times))
+
+    # plot single frame
+    # getBinnedSpectrogram(specArray[0], 0, x, y, z, c, binnedFreqs, baseFreqs, times)
 
     # x, y, z, c = listResults[0], listResults[1], listResults[2], listResults[3]
-    multiDimensionPlotting(x,y,z,c)
+    # multiDimensionPlotting(x,y,z,c)
 
 #must use this for multitprocessing
 if __name__ == '__main__':
