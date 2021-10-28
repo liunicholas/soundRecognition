@@ -143,10 +143,18 @@ def getOneSpectrogram(testParams):
     return([x,y,z,c])
 
 def init():
-    return threeDeeSpectrogram[0]
+    totalData = []
+    totalData.append(threeDeeSpectrogram[0])
+    return totalData
 
 def animate(i):
-    return threeDeeSpectrogram[i]
+    totalData = [[],[],[],[]]
+    for x in range(i):
+        totalData[0].extend(threeDeeSpectrogram[i][0])
+        totalData[1].extend(threeDeeSpectrogram[i][1])
+        totalData[2].extend(threeDeeSpectrogram[i][2])
+        totalData[3].extend(threeDeeSpectrogram[i][3])
+    return totalData
 
 def animationFunction(threeDeeSpectrogram):
     fig = plt.figure()
@@ -217,7 +225,7 @@ def main():
     for i in range(len(spectrogramGroupings)):
         threeDeeSpectrogram.append(getOneSpectrogram(spectrogramGroupings[i]))
 
-    print(threeDeeSpectrogram)
+    # print(threeDeeSpectrogram)
     animationFunction(threeDeeSpectrogram)
 
     # threeDeeSpectrogram = []
