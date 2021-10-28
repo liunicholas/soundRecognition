@@ -143,12 +143,11 @@ def getOneSpectrogram(testParams):
     return([x,y,z,c])
 
 def init():
-    totalData = []
-    totalData.append(threeDeeSpectrogram[0])
+    totalData = threeDeeSpectrogram[0]
     return totalData
 
 def animate(i):
-    totalData = [[],[],[],[]]
+    totalData = [],[],[],[]
     for x in range(i):
         totalData[0].extend(threeDeeSpectrogram[i][0])
         totalData[1].extend(threeDeeSpectrogram[i][1])
