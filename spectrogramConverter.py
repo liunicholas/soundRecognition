@@ -217,7 +217,7 @@ def main():
     for i in range(len(spectrogramGroupings)):
         threeDeeSpectrogram.append(getOneSpectrogram(spectrogramGroupings[i]))
 
-    # print(threeDeeSpectrogram)
+    print(threeDeeSpectrogram)
     animationFunction(threeDeeSpectrogram)
 
     # threeDeeSpectrogram = []
