@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
 from scipy.io import wavfile
+from scipy import signal
 
 from math import *
 import numpy as np
@@ -10,6 +11,33 @@ from multiprocessing import Pool
 import scipy.fft as fft
 
 # fftCount = 0
+
+def sciPySpectrogram(audioClip):
+    sample_rate, samples = wavfile.read(audioClip)
+    print(len(samples))
+
+    plt.plot(np.arange(1,len(samples)+1), samples)
+    plt.show()
+
+    sampleList = []
+    for i in range(samples.size//sample_rate):
+        sampleList.append(samples[:sample_rate])
+        samples = samples[sample_rate+1:]
+    # print(len(sampleList[0]))
+    frequencies, times, spectrogram = signal.spectrogram(sampleList[1], fs = 1/len(sampleList[0]))
+
+    print("frequencies:")
+    print(frequencies.shape)
+    print("time:")
+    print(times.shape)
+    print("spectrogram:")
+    print(spectrogram.shape)
+
+    plt.pcolormesh(times, frequencies, spectrogram, shading = 'auto')
+    plt.imshow(spectrogram)
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    plt.show()
 
 def hardCodeFreqs(baseFreqs):
     # data = read_csv("freqs.csv")
@@ -129,9 +157,12 @@ def animationFunction(threeDeeSpectrogram):
 
 def main():
     interval = 441           #number of samples to use per fft
-    # audioClip = "violin-C4.wav"
-    audioClip = "sine.wav"
+    audioClip = "violin-C4.wav"
+    # audioClip = "sine.wav"
     sample_rate, samples = readWavFile(audioClip)
+
+    # basic spectrogram using scipy signal
+    # sciPySpectrogram(audioClip)
 
     print("getting frequencies")
     frequencies = getFreqs(sample_rate)
@@ -176,11 +207,14 @@ def main():
 
     # print(spectrogramGroupings)
 
-    global threeDeeSpectrogram
-    with Pool(processes=8, maxtasksperchild = 1) as pool:
-            threeDeeSpectrogram = pool.map(getOneSpectrogram, spectrogramGroupings)
-            pool.close()
-            pool.join()
+    # global threeDeeSpectrogram
+    # with Pool(processes=8, maxtasksperchild = 1) as pool:
+    #         threeDeeSpectrogram = pool.map(getOneSpectrogram, spectrogramGroupings)
+    #         pool.close()
+    #         pool.join()
+    global threeDeeSpectrogram = []
+    for i in range(len(spectrogramGroupings)):
+        threeDeeSpectrogram.append(getOneSpectrogram(spectrogramGroupings[i]))
 
     # print(threeDeeSpectrogram)
     animationFunction(threeDeeSpectrogram)
