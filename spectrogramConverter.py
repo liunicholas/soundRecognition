@@ -212,7 +212,8 @@ def main():
     #         threeDeeSpectrogram = pool.map(getOneSpectrogram, spectrogramGroupings)
     #         pool.close()
     #         pool.join()
-    global threeDeeSpectrogram = []
+    global threeDeeSpectrogram
+    threeDeeSpectrogram = []
     for i in range(len(spectrogramGroupings)):
         threeDeeSpectrogram.append(getOneSpectrogram(spectrogramGroupings[i]))
 
