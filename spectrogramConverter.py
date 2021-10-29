@@ -10,14 +10,11 @@ import numpy as np
 from multiprocessing import Pool
 import scipy.fft as fft
 
-# fftCount = 0
-
 def sciPySpectrogram(audioClip):
     sample_rate, samples = wavfile.read(audioClip)
     print(len(samples))
 
     Time = np.linspace(0, len(samples) / sample_rate, num=len(samples))
-
     plt.plot(Time[:200], samples[:200])
     plt.show()
 
@@ -25,7 +22,7 @@ def sciPySpectrogram(audioClip):
     for i in range(samples.size//sample_rate):
         sampleList.append(samples[:sample_rate])
         samples = samples[sample_rate+1:]
-    # print(len(sampleList[0]))
+
     frequencies, times, spectrogram = signal.spectrogram(sampleList[1], fs = 1/len(sampleList[0]))
 
     print("frequencies:")
@@ -59,15 +56,16 @@ def hardCodeFreqs(baseFreqs):
             multiple+=1
         binnedFreqs.append(currentFreqList)
 
-    # print(binnedFreqs[0])
-
     return binnedFreqs
+
 def readWavFile(audioClip):
     sample_rate, samples = wavfile.read(audioClip)
     return sample_rate, samples
+
 def getFreqs(sample_rate):
     freqs = fft.fftfreq(sample_rate,1/sample_rate)
     return freqs[:5012]
+
 def getTimesAndSamples(samples, sample_rate, interval):
     times = []
     time = 0.0
@@ -195,8 +193,6 @@ def main():
     #bin frequncies using base frequencies
     binnedFreqs = hardCodeFreqs(baseFreqs)
 
-    # x, y, z, c = [], [], [], []
-
     # plot single frame
     # getBinnedSpectrogram(specArray[0], 0, x, y, z, c, binnedFreqs, baseFreqs, times)
 
@@ -216,8 +212,6 @@ def main():
         oneGroup.append(baseFreqs)
         oneGroup.append(times)
         spectrogramGroupings.append(oneGroup)
-
-    # print(spectrogramGroupings)
 
     # global threeDeeSpectrogram
     # with Pool(processes=8, maxtasksperchild = 1) as pool:
