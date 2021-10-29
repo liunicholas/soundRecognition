@@ -16,7 +16,9 @@ def sciPySpectrogram(audioClip):
     sample_rate, samples = wavfile.read(audioClip)
     print(len(samples))
 
-    plt.plot(np.arange(1,len(samples)+1), samples)
+    Time = np.linspace(0, len(samples) / sample_rate, num=len(samples))
+
+    plt.plot(Time[:200], samples[:200])
     plt.show()
 
     sampleList = []
@@ -78,8 +80,8 @@ def getTimesAndSamples(samples, sample_rate, interval):
         time += interval/sample_rate
 
     return times, sampleList
+
 def getScipyFFT(sample):
-    # global fftCount
     fftResult = fft.fft(sample)
     fftFixed = []
     for val in fftResult[:5012]:
@@ -88,10 +90,8 @@ def getScipyFFT(sample):
     for i, val in enumerate(fftFixed):
         fftFixed[i]=val/max(fftFixed)
 
-    # print(fftCount)
-    # fftCount+=1
-
     return fftFixed
+
 def plotSpectrogram(times, frequencies, specArray):
     specArrayT = np.transpose(specArray)
 
@@ -177,7 +177,6 @@ def main():
 
     #gets groups of samples and the times that each sample starts at
     times, sampleList = getTimesAndSamples(samples, sample_rate, interval)
-    print("made times and sample list")
     with Pool(processes=8, maxtasksperchild = 1) as pool:
             print("making fft for samples")
             spectrogramList = pool.map(getScipyFFT, sampleList)
@@ -197,9 +196,15 @@ def main():
     binnedFreqs = hardCodeFreqs(baseFreqs)
 
     # x, y, z, c = [], [], [], []
+
+    # plot single frame
+    # getBinnedSpectrogram(specArray[0], 0, x, y, z, c, binnedFreqs, baseFreqs, times)
+
     # plot every frame at once
     # for index in range(len(specArray)):
     #     getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
+
+    # multiDimensionPlotting(x,y,z,c)
 
     print("creating 3d spectrogram at each interval")
     spectrogramGroupings = []
@@ -230,12 +235,6 @@ def main():
     # threeDeeSpectrogram = []
     # for index in range(len(specArray)):
     #     threeDeeSpectrogram.append(getOneSpectrogram(specArray[index], index, binnedFreqs, baseFreqs, times))
-
-    # plot single frame
-    # getBinnedSpectrogram(specArray[0], 0, x, y, z, c, binnedFreqs, baseFreqs, times)
-
-    # x, y, z, c = listResults[0], listResults[1], listResults[2], listResults[3]
-    # multiDimensionPlotting(x,y,z,c)
 
 #must use this for multitprocessing
 if __name__ == '__main__':
