@@ -1,42 +1,12 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.animation import FuncAnimation
 from scipy.io import wavfile
-from scipy import signal
 
 from math import *
 import numpy as np
 
 from multiprocessing import Pool
 import scipy.fft as fft
-
-def sciPySpectrogram(audioClip):
-    sample_rate, samples = wavfile.read(audioClip)
-    print(len(samples))
-
-    Time = np.linspace(0, len(samples) / sample_rate, num=len(samples))
-    plt.plot(Time[:200], samples[:200])
-    plt.show()
-
-    sampleList = []
-    for i in range(samples.size//sample_rate):
-        sampleList.append(samples[:sample_rate])
-        samples = samples[sample_rate+1:]
-
-    frequencies, times, spectrogram = signal.spectrogram(sampleList[1], fs = 1/len(sampleList[0]))
-
-    print("frequencies:")
-    print(frequencies.shape)
-    print("time:")
-    print(times.shape)
-    print("spectrogram:")
-    print(spectrogram.shape)
-
-    plt.pcolormesh(times, frequencies, spectrogram, shading = 'auto')
-    plt.imshow(spectrogram)
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [sec]')
-    plt.show()
 
 def hardCodeFreqs(baseFreqs):
     # data = read_csv("freqs.csv")
@@ -104,15 +74,17 @@ def plotSpectrogram(times, frequencies, specArray):
     plt.show()
 
 def getBinnedSpectrogram(oneInterval, index, x, y, z, c, binnedFreqs, baseFreqs, times):
+    threshold = -1
     # x, y, z, c = [], [], [], []
     for i in range(len(oneInterval)):
         for j in range(len(binnedFreqs)):
             for k in range(len(binnedFreqs[j])):
                 if i == binnedFreqs[j][k]:
-                    x.append(times[index])
-                    y.append(baseFreqs[j])
-                    z.append(k)
-                    c.append(oneInterval[i])
+                    if oneInterval[i]>threshold:
+                        x.append(times[index])
+                        y.append(baseFreqs[j])
+                        z.append(k)
+                        c.append(oneInterval[i])
 
     print(f"finished interval {index}")
 
@@ -126,48 +98,19 @@ def multiDimensionPlotting(x, y, z, c):
     plt.savefig("./plots/multiDimensionSpectrogram.png")
     plt.show()
 
-def getOneSpectrogram(testParams):
-    oneInterval, index, binnedFreqs, baseFreqs, times = testParams[0], testParams[1], testParams[2], testParams[3], testParams[4]
-    x, y, z, c = [], [], [], []
-    for i in range(len(oneInterval)):
-        for j in range(len(binnedFreqs)):
-            for k in range(len(binnedFreqs[j])):
-                if i == binnedFreqs[j][k]:
-                    x.append(times[index])
-                    y.append(baseFreqs[j])
-                    z.append(k)
-                    c.append(oneInterval[i])
+def maxLengthListOfList(lists):
+    maxLength = 0
+    for list in lists:
+        if len(list) > maxLength:
+            maxLength = len(list)
 
-    return([x,y,z,c])
-
-def init():
-    totalData = threeDeeSpectrogram[0]
-    return totalData
-
-def animate(i):
-    totalData = [],[],[],[]
-    for x in range(i):
-        totalData[0].extend(threeDeeSpectrogram[i][0])
-        totalData[1].extend(threeDeeSpectrogram[i][1])
-        totalData[2].extend(threeDeeSpectrogram[i][2])
-        totalData[3].extend(threeDeeSpectrogram[i][3])
-    return totalData
-
-def animationFunction(threeDeeSpectrogram):
-    fig = plt.figure()
-    ax = Axes3D(fig)
-    anim = FuncAnimation(fig, animate, init_func=init,
-        frames=len(threeDeeSpectrogram), interval=20, blit=False)
-    plt.show()
+    return maxLength
 
 def main():
     interval = 441           #number of samples to use per fft
     audioClip = "violin-C4.wav"
     # audioClip = "sine.wav"
     sample_rate, samples = readWavFile(audioClip)
-
-    # basic spectrogram using scipy signal
-    # sciPySpectrogram(audioClip)
 
     print("getting frequencies")
     frequencies = getFreqs(sample_rate)
@@ -194,41 +137,45 @@ def main():
     binnedFreqs = hardCodeFreqs(baseFreqs)
 
     # plot single frame
+    # x, y, z, c = [], [], [], []
     # getBinnedSpectrogram(specArray[0], 0, x, y, z, c, binnedFreqs, baseFreqs, times)
-
-    # plot every frame at once
-    # for index in range(len(specArray)):
-    #     getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
 
     # multiDimensionPlotting(x,y,z,c)
 
-    print("creating 3d spectrogram at each interval")
-    spectrogramGroupings = []
+    print("organizing lists for machine learning")
+    #find most amount of harmonics in a list
+    lengthList = maxLengthListOfList(binnedFreqs)
+    print(f"length of each row: {lengthList}")
+
+    # print(spectrogramOneInterval)
+    # length = len(spectrogramOneInterval[0])
+    # for list in spectrogramOneInterval:
+    #     assert len(list) == length
+
+    # get every frame
+    convertedWavData = []
     for index in range(len(specArray)):
-        oneGroup = []
-        oneGroup.append(specArray[index])
-        oneGroup.append(index)
-        oneGroup.append(binnedFreqs)
-        oneGroup.append(baseFreqs)
-        oneGroup.append(times)
-        spectrogramGroupings.append(oneGroup)
+        x, y, z, c = [], [], [], []
+        getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
 
-    # global threeDeeSpectrogram
-    # with Pool(processes=8, maxtasksperchild = 1) as pool:
-    #         threeDeeSpectrogram = pool.map(getOneSpectrogram, spectrogramGroupings)
-    #         pool.close()
-    #         pool.join()
-    global threeDeeSpectrogram
-    threeDeeSpectrogram = []
-    for i in range(len(spectrogramGroupings)):
-        threeDeeSpectrogram.append(getOneSpectrogram(spectrogramGroupings[i]))
+        # get a list of lists and each list represents a base frequency
+        spectrogramOneInterval = []
+        for i in range(len(baseFreqs)):
+            validPointsAtBaseFreq = []
+            for o in range(len(y)):
+                if y[o] == baseFreqs[i]:
+                    validPointsAtBaseFreq.append(c[o])
 
-    # print(threeDeeSpectrogram)
-    animationFunction(threeDeeSpectrogram)
+            baseFreqInterval = validPointsAtBaseFreq
+            for j in range(lengthList-len(validPointsAtBaseFreq)):
+                baseFreqInterval.append(0)
 
-    # threeDeeSpectrogram = []
-    # for index in range(len(specArray)):
-    #     threeDeeSpectrogram.append(getOneSpectrogram(specArray[index], index, binnedFreqs, baseFreqs, times))
+            spectrogramOneInterval.append(baseFreqInterval)
+
+        convertedWavData.append(spectrogramOneInterval)
+
+    convertedWavData = np.array(convertedWavData)
+    print(f"shape of data: {convertedWavData.shape}")
 
 #must use this for multitprocessing
 if __name__ == '__main__':
