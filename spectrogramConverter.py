@@ -167,7 +167,7 @@ def main():
     sample_rate, samples = readWavFile(audioClip)
 
     # basic spectrogram using scipy signal
-    # sciPySpectrogram(audioClip)
+    sciPySpectrogram(audioClip)
 
     print("getting frequencies")
     frequencies = getFreqs(sample_rate)
@@ -186,7 +186,7 @@ def main():
     specArray = np.array(spectrogramList)
 
     # plots spectrogram
-    # plotSpectrogram(times, frequencies, specArray)
+    plotSpectrogram(times, frequencies, specArray)
 
     print("making base and binned frequencies")
     baseFreqs = range(100,200)
@@ -194,37 +194,38 @@ def main():
     binnedFreqs = hardCodeFreqs(baseFreqs)
 
     # plot single frame
-    # getBinnedSpectrogram(specArray[0], 0, x, y, z, c, binnedFreqs, baseFreqs, times)
+    x, y, z, c = [], [], [], []
+    getBinnedSpectrogram(specArray[0], 0, x, y, z, c, binnedFreqs, baseFreqs, times)
 
     # plot every frame at once
     # for index in range(len(specArray)):
     #     getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
 
-    # multiDimensionPlotting(x,y,z,c)
+    multiDimensionPlotting(x,y,z,c)
 
-    print("creating 3d spectrogram at each interval")
-    spectrogramGroupings = []
-    for index in range(len(specArray)):
-        oneGroup = []
-        oneGroup.append(specArray[index])
-        oneGroup.append(index)
-        oneGroup.append(binnedFreqs)
-        oneGroup.append(baseFreqs)
-        oneGroup.append(times)
-        spectrogramGroupings.append(oneGroup)
+    # print("creating 3d spectrogram at each interval")
+    # spectrogramGroupings = []
+    # for index in range(len(specArray)):
+    #     oneGroup = []
+    #     oneGroup.append(specArray[index])
+    #     oneGroup.append(index)
+    #     oneGroup.append(binnedFreqs)
+    #     oneGroup.append(baseFreqs)
+    #     oneGroup.append(times)
+    #     spectrogramGroupings.append(oneGroup)
 
     # global threeDeeSpectrogram
     # with Pool(processes=8, maxtasksperchild = 1) as pool:
     #         threeDeeSpectrogram = pool.map(getOneSpectrogram, spectrogramGroupings)
     #         pool.close()
     #         pool.join()
-    global threeDeeSpectrogram
-    threeDeeSpectrogram = []
-    for i in range(len(spectrogramGroupings)):
-        threeDeeSpectrogram.append(getOneSpectrogram(spectrogramGroupings[i]))
+    # global threeDeeSpectrogram
+    # threeDeeSpectrogram = []
+    # for i in range(len(spectrogramGroupings)):
+    #     threeDeeSpectrogram.append(getOneSpectrogram(spectrogramGroupings[i]))
 
     # print(threeDeeSpectrogram)
-    animationFunction(threeDeeSpectrogram)
+    # animationFunction(threeDeeSpectrogram)
 
     # threeDeeSpectrogram = []
     # for index in range(len(specArray)):
