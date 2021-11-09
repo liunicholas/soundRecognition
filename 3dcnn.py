@@ -1,4 +1,4 @@
-# imports 
+# imports
 import tensorflow
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Conv3D, MaxPooling3D
@@ -16,6 +16,7 @@ learning_rate = 0.001
 no_classes = 10
 validation_split = 0.2
 verbosity = 1
+
 
 
 # Convert 1D vector into 3D values, provided by the 3D MNIST authors at
@@ -57,10 +58,22 @@ with h5py.File("./full_dataset_vectors.h5", "r") as hf:
     targets_train = to_categorical(targets_train).astype(np.integer)
     targets_test = to_categorical(targets_test).astype(np.integer)
 
-
 # Create the model
+# shape of data: 62, 50, 100
+
+tf.keras.layers.Conv3D(
+    filters, kernel_size=3, strides=1, padding='valid',
+    data_format=None, dilation_rate=1, groups=1, activation=None,
+    use_bias=True, kernel_initializer='glorot_uniform',
+    bias_initializer='zeros', kernel_regularizer=None,
+    bias_regularizer=None, activity_regularizer=None, kernel_constraint=None,
+    bias_constraint=None, **kwargs
+)
+
+
+
 model = Sequential()
-model.add(Conv3D(32, kernel_size=(3, 3, 3), activation='relu', kernel_initializer='he_uniform', input_shape=sample_shape))
+model.add(Conv3D(32, kernel_size=3, input_shape(62, 50, 100, 1), activation='relu', kernel_initializer='he_uniform', input_shape=sample_shape))
 model.add(MaxPooling3D(pool_size=(2, 2, 2)))
 model.add(Conv3D(64, kernel_size=(3, 3, 3), activation='relu', kernel_initializer='he_uniform'))
 model.add(MaxPooling3D(pool_size=(2, 2, 2)))
