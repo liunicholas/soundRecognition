@@ -71,9 +71,8 @@ tf.keras.layers.Conv3D(
 )
 
 
-
 model = Sequential()
-model.add(Conv3D(32, kernel_size=3, input_shape(62, 50, 100, 1), activation='relu', kernel_initializer='he_uniform', input_shape=sample_shape))
+model.add(Conv3D(32, kernel_size=3, input_shape(62, 50, 100, 1), activation='relu'))
 model.add(MaxPooling3D(pool_size=(2, 2, 2)))
 model.add(Conv3D(64, kernel_size=(3, 3, 3), activation='relu', kernel_initializer='he_uniform'))
 model.add(MaxPooling3D(pool_size=(2, 2, 2)))
