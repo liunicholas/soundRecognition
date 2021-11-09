@@ -17,7 +17,7 @@ no_classes = 10
 validation_split = 0.2
 verbosity = 1
 
-
+"""
 # Convert 1D vector into 3D values, provided by the 3D MNIST authors at
 # https://www.kaggle.com/daavoo/3d-mnist
 def array_to_color(array, cmap="Oranges"):
@@ -33,7 +33,7 @@ def rgb_data_transform(data):
   for i in range(data.shape[0]):
     data_t.append(array_to_color(data[i]).reshape(16, 16, 16, 3))
   return np.asarray(data_t, dtype=np.float32)
-
+"""
 
 
 # -- Process code --
