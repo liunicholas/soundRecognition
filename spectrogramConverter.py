@@ -180,6 +180,7 @@ def convertSpectrogram(audioClip):
     convertedWavData = np.array(convertedWavData)
     print(f"shape of data: {convertedWavData.shape}")
     # shape of data: (62, 100, 50)
+    # intervals --> base frequencies --> index harmonics
 
     return convertedWavData
 

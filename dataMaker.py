@@ -9,6 +9,7 @@ counter = 1
 
 def main():
     global counter
+    global allData
     wavFiles = os.listdir(directory)
     for WAV_FILENAME in wavFiles:
         print(f"gathering data for wav file {counter}")
