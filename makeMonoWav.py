@@ -4,6 +4,7 @@ from scipy.io import wavfile
 import wavio
 import time
 from multiprocessing import Pool
+import soundfile
 
 directory = "samples"
 newDirectory = "mono samples"
@@ -21,7 +22,8 @@ def makeMonoWav(WAV_FILENAME):
 
     x = np.array(x)
 
-    wavio.write(os.path.join(newDirectory, f"{WAV_FILENAME}"), x, 11025, sampwidth=3)
+    # wavio.write(os.path.join(newDirectory, f"{WAV_FILENAME}"), x, 11025, sampwidth=3)
+    soundfile.write(os.path.join(newDirectory, f"{WAV_FILENAME}"), x, 11025, subtype='PCM_16')
 
 def main():
     wavFiles = os.listdir(directory)
