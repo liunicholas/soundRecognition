@@ -106,15 +106,15 @@ def maxLengthListOfList(lists):
 
     return maxLength
 
-def main():
+def convertSpectrogram(audioClip):
     interval = 441           #number of samples to use per fft
-    audioClip = "violin-C4.wav"
+    # audioClip = "violin-C4.wav"
     # audioClip = "sine.wav"
     sample_rate, samples = readWavFile(audioClip)
 
-    print("getting frequencies")
+    # print("getting frequencies")
     frequencies = getFreqs(sample_rate)
-    print(f"frequencies:{frequencies}")
+    # print(f"frequencies:{frequencies}")
 
     #gets groups of samples and the times that each sample starts at
     times, sampleList = getTimesAndSamples(samples, sample_rate, interval)
@@ -131,7 +131,7 @@ def main():
     # plots spectrogram
     # plotSpectrogram(times, frequencies, specArray)
 
-    print("making base and binned frequencies")
+    # print("making base and binned frequencies")
     baseFreqs = range(100,200)
     #bin frequncies using base frequencies
     binnedFreqs = hardCodeFreqs(baseFreqs)
@@ -145,7 +145,7 @@ def main():
     print("organizing lists for machine learning")
     #find most amount of harmonics in a list
     lengthList = maxLengthListOfList(binnedFreqs)
-    print(f"length of each row: {lengthList}")
+    # print(f"length of each row: {lengthList}")
 
     # print(spectrogramOneInterval)
     # length = len(spectrogramOneInterval[0])
@@ -154,12 +154,14 @@ def main():
 
     # get every frame
     convertedWavData = []
+    #will have to standarize the range to be the same for every sample sound
     for index in range(len(specArray)):
         x, y, z, c = [], [], [], []
         getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
 
         # get a list of lists and each list represents a base frequency
         spectrogramOneInterval = []
+        #goes through each base freq and each will be a new list
         for i in range(len(baseFreqs)):
             validPointsAtBaseFreq = []
             for o in range(len(y)):
@@ -176,6 +178,7 @@ def main():
 
     convertedWavData = np.array(convertedWavData)
     print(f"shape of data: {convertedWavData.shape}")
+    # shape of data: (62, 100, 50)
 
 #must use this for multitprocessing
 if __name__ == '__main__':
