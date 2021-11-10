@@ -108,8 +108,8 @@ def maxLengthListOfList(lists):
 
 def convertSpectrogram(audioClip):
     interval = 441           #number of samples to use per fft
-    # audioClip = "violin-C4.wav"
-    # audioClip = "sine.wav"
+    # audioClip = "tools/violin-C4.wav"
+    # audioClip = "tools/sine.wav"
     sample_rate, samples = readWavFile(audioClip)
 
     # print("getting frequencies")
