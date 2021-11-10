@@ -156,7 +156,7 @@ def convertSpectrogram(audioClip):
     convertedWavData = []
     #will have to standarize the range to be the same for every sample sound
     # for index in range(len(specArray)):
-    for index in range(0,50,1):              #hard coded to maintain shape of data
+    for index in range(0,20,1):              #hard coded to maintain shape of data
         x, y, z, c = [], [], [], []
         getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
 
