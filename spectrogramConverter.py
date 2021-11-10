@@ -155,7 +155,8 @@ def convertSpectrogram(audioClip):
     # get every frame
     convertedWavData = []
     #will have to standarize the range to be the same for every sample sound
-    for index in range(len(specArray)):
+    # for index in range(len(specArray)):
+    for index in range(50,100,1):              #hard coded to maintain shape of data
         x, y, z, c = [], [], [], []
         getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
 
@@ -179,6 +180,13 @@ def convertSpectrogram(audioClip):
     convertedWavData = np.array(convertedWavData)
     print(f"shape of data: {convertedWavData.shape}")
     # shape of data: (62, 100, 50)
+
+    return convertedWavData
+
+def main():
+    # audioClip = "tools/violin-C4.wav"
+    # audioClip = "tools/sine.wav"
+    convertedWavData = convertSpectrogram(audioClip)
 
 #must use this for multitprocessing
 if __name__ == '__main__':
