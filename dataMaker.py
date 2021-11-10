@@ -12,7 +12,7 @@ def main():
     global allData
     wavFiles = os.listdir(directory)
     for WAV_FILENAME in wavFiles:
-        print(f"gathering data for wav file {counter}")
+        print(f"\ngathering data for wav file {counter}")
         filePath = os.path.join(directory, WAV_FILENAME)
 
         fourDspec = spectrogramConverter.convertSpectrogram(filePath)
