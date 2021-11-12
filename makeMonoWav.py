@@ -23,7 +23,8 @@ def makeMonoWav(WAV_FILENAME):
     x = np.array(x)
 
     # wavio.write(os.path.join(newDirectory, f"{WAV_FILENAME}"), x, 11025, sampwidth=3)
-    soundfile.write(os.path.join(newDirectory, f"{WAV_FILENAME}"), x, 11025, subtype='PCM_16')
+    if len(samples)/sample_rate > 3:    #only makes file if the sound is longer than given time
+        soundfile.write(os.path.join(newDirectory, f"{WAV_FILENAME}"), x, 11025, subtype='PCM_16')
 
 def main():
     wavFiles = os.listdir(directory)
