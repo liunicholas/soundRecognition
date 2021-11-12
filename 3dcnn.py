@@ -63,8 +63,8 @@ with h5py.File("./full_dataset_vectors.h5", "r") as hf:
 
 tf.keras.layers.Conv3D(
     filters, kernel_size=3, strides=1, padding='valid',
-    data_format=None, dilation_rate=1, groups=1, activation=None,
-    use_bias=True, kernel_initializer='glorot_uniform',
+    data_format=None, dilation_rate=1, groups=1, activation='relu',
+    use_bias=True, kernel_initializer='he_uniform',
     bias_initializer='zeros', kernel_regularizer=None,
     bias_regularizer=None, activity_regularizer=None, kernel_constraint=None,
     bias_constraint=None, **kwargs
@@ -72,9 +72,9 @@ tf.keras.layers.Conv3D(
 
 
 model = Sequential()
-model.add(Conv3D(32, kernel_size=3, input_shape(62, 50, 100, 1), activation='relu'))
+model.add(Conv3D(32, input_shape(62, 50, 100, 1)))
 model.add(MaxPooling3D(pool_size=(2, 2, 2)))
-model.add(Conv3D(64, kernel_size=(3, 3, 3), activation='relu', kernel_initializer='he_uniform'))
+model.add(Conv3D(64))
 model.add(MaxPooling3D(pool_size=(2, 2, 2)))
 model.add(Flatten())
 model.add(Dense(256, activation='relu', kernel_initializer='he_uniform'))
