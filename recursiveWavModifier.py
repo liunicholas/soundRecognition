@@ -8,7 +8,7 @@ import soundfile
 from os import listdir
 from os.path import isdir
 
-directory = "mono samples"
+directory = "soundSamples"
 pattern = ".wav"
 sampleRate = 11025
 lengthSample = 0.5
@@ -25,6 +25,12 @@ def searchFiles(path, pattern):
                 makeMonoWav(path + "/" + item)
 
 def makeMonoWav(filePath):
+    print(f"making fixed wav file at {filePath}")
+
+    #convert bitRate first
+    data, samplerate = soundfile.read(f'{filePath}')
+    soundfile.write(f'{filePath}', data, samplerate, subtype=f'PCM_{bitRate}')
+
     sample_rate, samples = wavfile.read(filePath)
 
     #convert stereo to mono
@@ -36,6 +42,7 @@ def makeMonoWav(filePath):
             x.append(pair[0])
 
         x = np.array(x)
+        print("converted stereo to mono")
     else:
         x = samples
 
