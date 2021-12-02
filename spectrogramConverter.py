@@ -55,8 +55,6 @@ def getScipyFFT(sample):
     for val in fftResult[:5012]:
         fftFixed.append(abs(val))
 
-    print(fftFixed)
-    print(max(fftFixed))
     for i, val in enumerate(fftFixed):
         fftFixed[i]=val/max(fftFixed)
 
