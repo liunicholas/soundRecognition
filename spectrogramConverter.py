@@ -56,7 +56,10 @@ def getScipyFFT(sample):
         fftFixed.append(abs(val))
 
     for i, val in enumerate(fftFixed):
-        fftFixed[i]=val/max(fftFixed)
+        if max(fftFixed) != 0:
+            fftFixed[i]=val/max(fftFixed)
+        else:
+            fftFixed[i] = 0
 
     return fftFixed
 
@@ -187,6 +190,7 @@ def convertSpectrogram(audioClip):
 def main():
     # audioClip = "tools/violin-C4.wav"
     # audioClip = "tools/sine.wav"
+    audioClip = "soundSamples/ALARM/Alarm-Fast-High-Pitch-A3-Ring-Tone-www.fesliyanstudios.com.wav"
     convertedWavData = convertSpectrogram(audioClip)
 
 #must use this for multitprocessing
