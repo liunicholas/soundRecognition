@@ -50,6 +50,16 @@ def makeMonoWav(filePath):
     else:
         x = samples
 
+    notZeroIndex = 0
+    while True:
+        if x[notZeroIndex] != 0:
+            break
+        else:
+            notZeroIndex += 1
+
+    x = x[notZeroIndex:]
+    print(x)
+
     if len(samples)/sample_rate > lengthSample and sum(abs(x))/len(x) > 10:    #only makes file if the sound is longer than given time
         soundfile.write(filePath, x, sampleRate, subtype=f'PCM_{bitRate}')
     else:
