@@ -10,7 +10,7 @@ from os.path import isdir
 directory = "soundSamples"
 pattern = ".wav"
 sampleRate = 11025
-lengthSample = 0.5
+lengthSample = 5
 bitRate = 16
 
 def searchFiles(path, pattern):
@@ -45,7 +45,6 @@ def makeMonoWav(filePath):
             print(pair[0])
             x.append(pair[0])
 
-        x = np.array(x)
         print("converted stereo to mono")
     else:
         x = samples
@@ -56,11 +55,14 @@ def makeMonoWav(filePath):
             break
         else:
             notZeroIndex += 1
+    x = x[notZeroIndex:notZeroIndex+int(lengthSample*sample_rate)]
 
-    x = x[notZeroIndex:]
+    print(f"length of sample: {len(x)}")
+    print(f"desired length: {int(lengthSample*sample_rate)}")
+
     print(x)
 
-    if len(samples)/sample_rate > lengthSample and sum(abs(x))/len(x) > 10:    #only makes file if the sound is longer than given time
+    if len(x) == int(lengthSample*sample_rate) and sum(abs(x))/len(x) > 10:    #only makes file if the sound is longer than given time
         soundfile.write(filePath, x, sampleRate, subtype=f'PCM_{bitRate}')
     else:
         remove(filePath)
