@@ -14,16 +14,16 @@ def sciPySpectrogram(audioClip):
     sample_rate, samples = wavfile.read(audioClip)
     print(len(samples))
 
-    Time = np.linspace(0, len(samples) / sample_rate, num=len(samples))
-    plt.plot(Time[:200], samples[:200])
-    plt.show()
+    # Time = np.linspace(0, len(samples) / sample_rate, num=len(samples))
+    # plt.plot(Time[:200], samples[:200])
+    # plt.show()
 
     sampleList = []
     for i in range(samples.size//sample_rate):
         sampleList.append(samples[:sample_rate])
         samples = samples[sample_rate+1:]
 
-    frequencies, times, spectrogram = signal.spectrogram(sampleList[1], fs = 1/len(sampleList[0]))
+    frequencies, times, spectrogram = signal.spectrogram(sampleList[1], fs = 1/len(sampleList[1]))
 
     print("frequencies:")
     print(frequencies.shape)
@@ -167,6 +167,7 @@ def main():
     sample_rate, samples = readWavFile(audioClip)
 
     # basic spectrogram using scipy signal
+    print("Spectrogram using SciPy default spectrogram")
     sciPySpectrogram(audioClip)
 
     print("getting frequencies")
@@ -185,7 +186,7 @@ def main():
     frequencies = np.array(frequencies)
     specArray = np.array(spectrogramList)
 
-    # plots spectrogram
+    print("Cutom spectrogram:")
     plotSpectrogram(times, frequencies, specArray)
 
     print("making base and binned frequencies")
@@ -201,6 +202,7 @@ def main():
     # for index in range(len(specArray)):
     #     getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
 
+    print("Four-Dimensional Spectrogram")
     multiDimensionPlotting(x,y,z,c)
 
     # print("creating 3d spectrogram at each interval")
