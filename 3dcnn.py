@@ -76,8 +76,8 @@ tf.keras.layers.Conv3D(
 
 
 model = Sequential()
-model.add(Conv3D(32, input_shape(62, 50, 100, 1)))
-#60, 58, 98, 32
+model.add(Conv3D(32, input_shape(10, 100, 50, 1)))
+#8, 98, 48, 32
 model.add(MaxPooling3D(pool_size=(2, 2, 2)))
 #30, 29, 49, 32
 model.add(Conv3D(64))
