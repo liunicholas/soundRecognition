@@ -91,25 +91,6 @@ validation_split = 0.2
 verbosity = 1
 
 
-def getData(dataPath):
-    dataX = []
-    dataY = []
-
-    folders = os.listdir(dataPath)
-    for folder in folders:
-        if os.path.isdir(f"{dataPath}/{folder}"):
-            for filename in os.listdir(f"{dataPath}/{folder}"):
-                filePath = f"{dataPath}/{folder}/{filename}"
-                print(filePath)
-
-                with open(filePath, 'rb') as f:
-                    numpyArray = np.load(f)
-                    print(np.shape(numpyArray))
-                    dataX.append(numpyArray)
-                    dataY.append(folder)
-
-    return dataX, dataY
-
 
 
 # Convert 1D vector into 3D values, provided by the 3D MNIST authors at
@@ -207,11 +188,3 @@ history = model.fit(X_train, targets_train,
 # plt.xlabel('No. epoch')
 # plt.legend(loc="upper left")
 # plt.show()
-
-def main():
-    dataPath = "spectrogramData"
-    dataX, dataY = getData(dataPath)
-    print(dataX)
-    print(dataY)
-
-main()
