@@ -73,6 +73,9 @@ class CNN():
     def print_summary(self, summaryStr):
         print(summaryStr)
 
+
+# claire pt2
+"""
 # imports
 import tensorflow
 from tensorflow.keras.models import Sequential
@@ -188,3 +191,4 @@ history = model.fit(X_train, targets_train,
 # plt.xlabel('No. epoch')
 # plt.legend(loc="upper left")
 # plt.show()
+"""
