@@ -9,8 +9,8 @@ import tensorflow.keras.losses as losses
 import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-checkpoint_path = "training1/1.ckpt"
-cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1, save_freq='epoch')
+#checkpoint_path = "./chckpt"
+#cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1, save_freq='epoch')
 
 train = tf.keras.preprocessing.image_dataset_from_directory(
     './soundSamples', labels='inferred', label_mode='categorical',
