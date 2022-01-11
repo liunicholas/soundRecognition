@@ -13,47 +13,24 @@ BATCH_SIZE_TEST = 32
 class CNN():
     def __init__(self, input_shape):
         self.model = models.Sequential()
-        # For Conv2D, you give it: Outgoing Layers, Frame size.  Everything else needs a keyword.
-        # Popular keyword choices: strides (default is strides=1), padding (="valid" means 0, ="same" means whatever gives same output width/height as input).  Not sure yet what to do if you want some other padding.
-        # Activation function is built right into the Conv2D function as a keyword argument.
 
-        self.model.add(layers.Conv1D(32, 3, input_shape = input_shape, activation = 'relu'))
-        self.model.add(layers.MaxPool2D(pool_size = 2))
-        # self.model.add(layers.BatchNormalization(trainable=False))
-        # self.model.add(Dropout(0.05))
+        self.model.add(layers.Conv3D(8, (3, 3, 3) input_shape = input_shape, activation = 'relu', padding='same'))
+        self.model.add(layers.Conv3D(16, (3,3,3), activation='relu', padding='same')
+        self.model.add(layers.MaxPool3D((2,2,2), padding='same')
 
-        # self.model.add(layers.MaxPooling2D(pool_size = 2))
+        self.model.add(layers.Conv3D(32, (3,3,3), activation='relu', padding='same')
+        self.model.add(layers.Conv3D(64, (3,3,3), activation='relu', padding='same')
+        self.model.add(layers.MaxPooling3D((2,2,2), padding='same'))
 
-        self.model.add(layers.Conv1D(16, 3, activation = 'relu'))
-        self.model.add(layers.MaxPool2D(pool_size = 2))
-        # self.model.add(layers.BatchNormalization(trainable=False))
-        # self.model.add(Dropout(0.1))
-
-        # self.model.add(layers.Conv1D(128, 3, activation = 'relu'))
-        # self.model.add(layers.BatchNormalization(trainable=False))
-        # self.model.add(Dropout(0.15))
-
-        # self.model.add(layers.Conv1D(256, 3, activation = 'relu'))
-        # self.model.add(layers.BatchNormalization(trainable=False))
-        # self.model.add(Dropout(0.2))
-
-        # self.model.add(layers.MaxPooling2D(pool_size = 2))
-
+        self.model.add(layers.Conv3D(16, (3,3,3), activation='relu', padding='same'))
+        self.model.add(layers.BatchNormalization())
         self.model.add(layers.Flatten())
 
-        #get to one value
-        # self.model.add(layers.Dense(2400, activation = 'relu', input_shape = input_shape))
-        # self.model.add(layers.Dense(1200, activation = 'relu'))
-        # self.model.add(layers.Dense(600, activation = 'relu'))
-        # self.model.add(layers.Dense(300, activation = 'relu'))
-        # self.model.add(layers.Dense(120, activation = 'relu'))
-        # self.model.add(layers.Dense(60, activation = 'relu'))
-        # self.model.add(layers.Dense(20, activation = 'relu'))
-        # self.model.add(layers.Dense(1))
-
-        # self.model.add(layers.Dense(32, activation = 'relu', input_shape = input_shape))
-        # self.model.add(layers.Dense(16, activation = 'relu'))
-        self.model.add(layers.Dense(1))
+        self.model.add(layers.Dense(units=1024, activation='relu'))
+        self.model.add(layers.Dropout(0.4))
+        self.model.add(layers.Dense(units=256, activation='relu'))
+        self.model.add(layers.Dropout(0.4))
+        self.model.add(layers.Dense(units=10, activation='softmax'))
 
         #lr=0.001, momentum=0.9
         self.optimizer = optimizers.Adam(lr=0.00001)
