@@ -5,14 +5,16 @@ from tensorflow.keras.layers import Dropout
 import tensorflow.keras.optimizers as optimizers
 import tensorflow.keras.losses as losses
 
-TRAIN_EPOCHS = 100
-BATCH_SIZE_TRAIN = 32
-BATCH_SIZE_TEST = 32
+TRAIN_EPOCHS = 10
+BATCH_SIZE_TRAIN = 4
+BATCH_SIZE_TEST = 4
+soundsClassified = 12
 
 #CNN for 3D numpy array
 class CNN():
     def __init__(self, input_shape):
         self.model = models.Sequential()
+<<<<<<< Updated upstream
 
         self.model.add(layers.Conv3D(8, (3, 3, 3) input_shape = input_shape, activation = 'relu', padding='same'))
         self.model.add(layers.Conv3D(16, (3,3,3), activation='relu', padding='same')
@@ -21,27 +23,36 @@ class CNN():
         self.model.add(layers.Conv3D(32, (3,3,3), activation='relu', padding='same')
         self.model.add(layers.Conv3D(64, (3,3,3), activation='relu', padding='same')
         self.model.add(layers.MaxPooling3D((2,2,2), padding='same'))
+=======
+        self.model.add(layers.Conv3D(32, (3, 3, 3), activation='relu', input_shape=input_shape))
+        # self.model.add(layers.MaxPooling3D((2, 2, 2)))
+        # self.model.add(layers.Conv3D(64, (3, 3, 3), activation='relu'))
+        # self.model.add(layers.MaxPooling3D((2, 2, 2)))
+        # self.model.add(layers.Conv3D(64, (3, 3, 3), activation='relu'))
+>>>>>>> Stashed changes
 
         self.model.add(layers.Conv3D(16, (3,3,3), activation='relu', padding='same'))
         self.model.add(layers.BatchNormalization())
         self.model.add(layers.Flatten())
+<<<<<<< Updated upstream
 
         self.model.add(layers.Dense(units=1024, activation='relu'))
         self.model.add(layers.Dropout(0.4))
         self.model.add(layers.Dense(units=256, activation='relu'))
         self.model.add(layers.Dropout(0.4))
         self.model.add(layers.Dense(units=10, activation='softmax'))
+=======
+        self.model.add(layers.Dense(64, activation='relu'))
+        self.model.add(layers.Dense(soundsClassified))
+>>>>>>> Stashed changes
 
         #lr=0.001, momentum=0.9
         self.optimizer = optimizers.Adam(lr=0.00001)
-        #absolute for regression, squared for classification
-
-        #Absolute for few outliers
-        #squared to aggresively diminish outliers
-        self.loss = losses.MeanSquaredError()
-        #metrics=['accuracy']
-        #metrics=['mse']
+        self.loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        self.metrics = ['accuracy']
         self.model.compile(loss=self.loss, optimizer=self.optimizer)
+
+        self.model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
 
     def __str__(self):
         self.model.summary(print_fn = self.print_summary)
