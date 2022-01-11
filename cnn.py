@@ -21,8 +21,6 @@ class CNN():
         # self.model.add(layers.MaxPooling3D((2, 2, 2)))
         # self.model.add(layers.Conv3D(64, (3, 3, 3), activation='relu'))
 
-
-
         self.model.add(layers.Flatten())
         self.model.add(layers.Dense(64, activation='relu'))
         self.model.add(layers.Dense(soundsClassified))
