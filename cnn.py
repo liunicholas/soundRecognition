@@ -16,17 +16,20 @@ class CNN():
         self.model = models.Sequential()
 
         self.model.add(layers.Conv3D(32, (3, 3, 3), activation='relu', input_shape=input_shape))
-        # self.model.add(layers.MaxPooling3D((2, 2, 2)))
+        self.model.add(layers.MaxPooling3D((2, 2, 2)))
         # self.model.add(layers.Conv3D(64, (3, 3, 3), activation='relu'))
         # self.model.add(layers.MaxPooling3D((2, 2, 2)))
         # self.model.add(layers.Conv3D(64, (3, 3, 3), activation='relu'))
 
         self.model.add(layers.Flatten())
-        self.model.add(layers.Dense(64, activation='relu'))
+        self.model.add(layers.Dense(48, activation='relu'))
+        self.model.add(Dropout(0.5))
+        self.model.add(layers.Dense(24, activation='relu'))
+        self.model.add(Dropout(0.5))
         self.model.add(layers.Dense(soundsClassified))
 
         #lr=0.001, momentum=0.9
-        self.optimizer = optimizers.Adam(lr=0.00001)
+        self.optimizer = optimizers.Adam(lr=0.001)
         self.loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.metrics = ['accuracy']
         self.model.compile(loss=self.loss, optimizer=self.optimizer)

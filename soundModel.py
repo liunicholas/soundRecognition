@@ -63,12 +63,12 @@ def getData(dataPath):
                     dataX.append(numpyArray)
                     dataY.append(folders.index(folder))
 
-    return dataX, dataY
+    return dataX, dataY, folders
 
 def main():
     setCustomCallback()
 
-    dataX, dataY = getData(dataPath)
+    dataX, dataY, folders = getData(dataPath)
     # print(dataX, dataY)
     trainX, testX, trainY, testY = train_test_split(dataX, dataY, train_size=0.67, random_state=42)
 
@@ -87,6 +87,27 @@ def main():
         steps_per_epoch=len(trainX)/BATCH_SIZE_TRAIN,
         validation_steps=len(testX)/BATCH_SIZE_TEST,
         callbacks=[customCallback])
+
+    cnn.model.save(savedModelsPath)
+
+    fig = plt.figure("training stats", figsize=(12, 8))
+    fig.tight_layout()
+
+    plt1 = fig.add_subplot(121)
+    plt1.title.set_text("loss")
+    plt1.plot(np.arange(0, TRAIN_EPOCHS), results.history['loss'], color="red", label="loss")
+    plt1.plot(np.arange(0, TRAIN_EPOCHS), results.history['val_loss'], color="green", label="val_loss")
+    plt1.legend(loc='upper right')
+
+    plt2 = fig.add_subplot(122)
+    plt2.title.set_text("accuracy")
+    plt2.plot(np.arange(0, TRAIN_EPOCHS), results.history['accuracy'], color="red", label="accuracy")
+    plt2.plot(np.arange(0, TRAIN_EPOCHS), results.history['val_accuracy'], color="green", label="val_accuracy")
+    plt2.legend(loc='upper right')
+
+    plt.savefig(f"{savedPlotsPath}/newestPlot.png")
+    plt.show()
+
 
 if __name__ == "__main__":
     main()
