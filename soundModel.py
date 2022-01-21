@@ -103,7 +103,7 @@ def main():
     plt2.title.set_text("accuracy")
     plt2.plot(np.arange(0, TRAIN_EPOCHS), results.history['accuracy'], color="red", label="accuracy")
     plt2.plot(np.arange(0, TRAIN_EPOCHS), results.history['val_accuracy'], color="green", label="val_accuracy")
-    plt2.legend(loc='upper right')
+    plt2.legend(loc='lower right')
 
     plt.savefig(f"{savedPlotsPath}/newestPlot.png")
     plt.show()
