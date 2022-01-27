@@ -16,7 +16,7 @@ import wavio
 # Parameters
 rate = 11025    # samples per second
 T = 2           # sample duration (seconds)
-f = 440.0       # sound frequency (Hz)
+f = 2093       # sound frequency (Hz)
 # Compute waveform samples
 t = np.linspace(0, T, T*rate, endpoint=False)
 x = np.sin(2*np.pi * f * t)
