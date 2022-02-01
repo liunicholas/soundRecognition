@@ -10,9 +10,24 @@ BATCH_SIZE_TRAIN = 4
 BATCH_SIZE_TEST = 4
 soundsClassified = 12
 
-#CNN for 3D numpy array
+#CNN for 2D numpy array
 class CNN():
     def __init__(self, input_shape):
+        self.model = models.Sequential([
+        self.model.add(layers.Input(shape=input_shape))
+        self.layers.Resizing(32, 32)
+        self.norm_layer
+        layers.Conv2D(32, 3, activation='relu'),
+        layers.Conv2D(64, 3, activation='relu'),
+        layers.MaxPooling2D(),
+        layers.Dropout(0.25),
+        layers.Flatten(),
+        layers.Dense(128, activation='relu'),
+        layers.Dropout(0.5),
+        layers.Dense(num_labels)
+
+
+
         self.model = models.Sequential()
 
         self.model.add(layers.Conv3D(32, (3, 3, 3), activation='relu', input_shape=input_shape))
