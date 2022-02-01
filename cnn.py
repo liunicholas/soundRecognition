@@ -13,21 +13,20 @@ soundsClassified = 12
 #CNN for 2D numpy array
 class CNN():
     def __init__(self, input_shape):
-        self.model = models.Sequential([
+        self.model = models.Sequential()
         self.model.add(layers.Input(shape=input_shape))
         self.layers.Resizing(32, 32)
-        self.norm_layer
-        layers.Conv2D(32, 3, activation='relu'),
-        layers.Conv2D(64, 3, activation='relu'),
-        layers.MaxPooling2D(),
-        layers.Dropout(0.25),
-        layers.Flatten(),
-        layers.Dense(128, activation='relu'),
-        layers.Dropout(0.5),
-        layers.Dense(num_labels)
+        self.norm_layer()
+        self.layers.Conv2D(32, 3, activation='relu')
+        self.layers.Conv2D(64, 3, activation='relu')
+        self.layers.MaxPooling2D()
+        self.layers.Dropout(0.25)
+        self.layers.Flatten()
+        self.layers.Dense(128, activation='relu')
+        self.layers.Dropout(0.5)
+        self.layers.Dense(soundsClassified)
 
-
-
+"""
         self.model = models.Sequential()
 
         self.model.add(layers.Conv3D(32, (3, 3, 3), activation='relu', input_shape=input_shape))
@@ -47,6 +46,7 @@ class CNN():
         self.model.compile(loss=self.loss, optimizer=self.optimizer)
 
         self.model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
+"""
 
     def __str__(self):
         self.model.summary(print_fn = self.print_summary)
