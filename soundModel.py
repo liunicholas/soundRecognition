@@ -10,15 +10,6 @@ from cnn import *               #edit cnn from cnn.py
 
 print('[INFO] Done importing packages.')
 
-#checks if GPU is recognized
-def checkGPU():
-    global devices
-    devices = tf.config.list_physical_devices('GPU')
-    if len(devices) > 0:
-        print('[INFO] GPU is detected.')
-    else:
-        print('[INFO] GPU not detected.')
-
 #to only save the best model after each epoch
 def setCustomCallback():
     global customCallback
