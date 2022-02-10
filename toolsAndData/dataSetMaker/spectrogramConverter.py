@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from scipy.io import wavfile
 
 from math import *
@@ -76,39 +75,6 @@ def plotSpectrogram(times, frequencies, specArray):
     plt.savefig("./plots/spectrogram.png")
     plt.show()
 
-def getBinnedSpectrogram(oneInterval, index, x, y, z, c, binnedFreqs, baseFreqs, times):
-    threshold = -1
-    # x, y, z, c = [], [], [], []
-    for i in range(len(oneInterval)):
-        for j in range(len(binnedFreqs)):
-            for k in range(len(binnedFreqs[j])):
-                if i == binnedFreqs[j][k]:
-                    if oneInterval[i]>threshold:
-                        x.append(times[index])
-                        y.append(baseFreqs[j])
-                        z.append(k)
-                        c.append(oneInterval[i])
-
-    print(f"finished interval {index}")
-
-def multiDimensionPlotting(x, y, z, c):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    img = ax.scatter(x, y, z, c=c, cmap=plt.hot())
-    fig.colorbar(img)
-
-    plt.savefig("./plots/multiDimensionSpectrogram.png")
-    plt.show()
-
-def maxLengthListOfList(lists):
-    maxLength = 0
-    for list in lists:
-        if len(list) > maxLength:
-            maxLength = len(list)
-
-    return maxLength
-
 def convertSpectrogram(audioClip):
     interval = 441           #number of samples to use per fft
     # audioClip = "tools/violin-C4.wav"
@@ -131,61 +97,7 @@ def convertSpectrogram(audioClip):
     frequencies = np.array(frequencies)
     specArray = np.array(spectrogramList)
 
-    # plots spectrogram
-    # plotSpectrogram(times, frequencies, specArray)
-
-    # print("making base and binned frequencies")
-    baseFreqs = range(100,200)
-    #bin frequncies using base frequencies
-    binnedFreqs = hardCodeFreqs(baseFreqs)
-
-    # plot single frame
-    # x, y, z, c = [], [], [], []
-    # getBinnedSpectrogram(specArray[0], 0, x, y, z, c, binnedFreqs, baseFreqs, times)
-
-    # multiDimensionPlotting(x,y,z,c)
-
-    print("organizing lists for machine learning")
-    #find most amount of harmonics in a list
-    lengthList = maxLengthListOfList(binnedFreqs)
-    # print(f"length of each row: {lengthList}")
-
-    # print(spectrogramOneInterval)
-    # length = len(spectrogramOneInterval[0])
-    # for list in spectrogramOneInterval:
-    #     assert len(list) == length
-
-    # get every frame
-    convertedWavData = []
-    #will have to standarize the range to be the same for every sample sound
-    # for index in range(len(specArray)):
-    for index in range(0,10,1):              #hard coded to maintain shape of data
-        x, y, z, c = [], [], [], []
-        getBinnedSpectrogram(specArray[index], index, x, y, z, c, binnedFreqs, baseFreqs, times)
-
-        # get a list of lists and each list represents a base frequency
-        spectrogramOneInterval = []
-        #goes through each base freq and each will be a new list
-        for i in range(len(baseFreqs)):
-            validPointsAtBaseFreq = []
-            for o in range(len(y)):
-                if y[o] == baseFreqs[i]:
-                    validPointsAtBaseFreq.append(c[o])
-
-            baseFreqInterval = validPointsAtBaseFreq
-            for j in range(lengthList-len(validPointsAtBaseFreq)):
-                baseFreqInterval.append(0)
-
-            spectrogramOneInterval.append(baseFreqInterval)
-
-        convertedWavData.append(spectrogramOneInterval)
-
-    convertedWavData = np.array(convertedWavData)
-    print(f"shape of data: {convertedWavData.shape}")
-    # shape of data: (62, 100, 50)
-    # intervals --> base frequencies --> index harmonics
-
-    return convertedWavData
+    return specArray
 
 def main():
     # audioClip = "tools/violin-C4.wav"

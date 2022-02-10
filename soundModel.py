@@ -42,6 +42,7 @@ def getData(dataPath):
     folders = os.listdir(dataPath)
     index = folders.index(".DS_Store")
     folders.pop(index)
+    print(folders)
     for folder in folders:
         if os.path.isdir(f"{dataPath}/{folder}"):
             for filename in os.listdir(f"{dataPath}/{folder}"):
@@ -63,7 +64,7 @@ def main():
     # print(dataX, dataY)
     trainX, testX, trainY, testY = train_test_split(dataX, dataY, train_size=0.67, random_state=42)
 
-    cnn = CNN((len(trainX[0]), len(trainX[0][0]), len(trainX[0][0][0]), 1))
+    cnn = CNN((len(trainX[0]), len(trainX[0][0]), 1))
     print("[INFO] Printing Tensorflow CNN Summary...")
     print(cnn)
 

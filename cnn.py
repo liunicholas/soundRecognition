@@ -15,11 +15,11 @@ class CNN():
     def __init__(self, input_shape):
         self.model = models.Sequential()
 
-        self.model.add(layers.Conv3D(32, (3, 3, 3), activation='relu', input_shape=input_shape))
+        self.model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
         # self.model.add(layers.MaxPooling3D((2, 2, 2)))
-        self.model.add(layers.Conv3D(64, (3, 3, 3), activation='relu'))
+        self.model.add(layers.Conv2D(64, (3, 3), activation='relu'))
         # self.model.add(layers.MaxPooling3D((2, 2, 2)))
-        self.model.add(layers.Conv3D(128, (3, 3, 3), activation='relu'))
+        self.model.add(layers.Conv2D(128, (3, 3), activation='relu'))
 
         self.model.add(layers.Flatten())
         self.model.add(layers.Dense(96, activation='relu'))
