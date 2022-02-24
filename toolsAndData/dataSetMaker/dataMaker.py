@@ -11,6 +11,8 @@ counter = 1
 def main():
     global counter
     folders = os.listdir(directory)
+    index = folders.index("PIANO")
+    folders.pop(index)
     for folder in folders:
         # print("here")
         if os.path.isdir(f"{directory}/{folder}"):
@@ -20,8 +22,8 @@ def main():
                     print(f"\ngathering data for wav file {counter}")
                     filePath = f"{directory}/{folder}/{filename}"
                     print(f"{filePath}")
-                    fourDspec = spectrogramConverter.convertSpectrogram(filePath)
-                    fourDspec = np.array(fourDspec)
+                    threeDspec = spectrogramConverter.convertSpectrogram(filePath)
+                    threeDspec = np.array(threeDspec)
 
                     newFileName = Path(filename).stem
 
@@ -29,7 +31,7 @@ def main():
                         os.makedirs(f"{dataPath}/{folder}")
 
                     with open(f"{dataPath}/{folder}/{newFileName}", 'wb') as f:
-                        np.save(f, fourDspec)
+                        np.save(f, threeDspec)
 
                     counter+=1
 
