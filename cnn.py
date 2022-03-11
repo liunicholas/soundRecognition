@@ -14,12 +14,13 @@ soundsClassified = 12
 class CNN():
     def __init__(self, input_shape):
         self.model = models.Sequential()
+        # print("here")
 
         self.model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
         # self.model.add(layers.MaxPooling3D((2, 2, 2)))
-        self.model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        # self.model.add(layers.MaxPooling3D((2, 2, 2)))
-        self.model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+        # self.model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        # # self.model.add(layers.MaxPooling3D((2, 2, 2)))
+        # self.model.add(layers.Conv2D(128, (3, 3), activation='relu'))
 
         self.model.add(layers.Flatten())
         self.model.add(layers.Dense(96, activation='relu'))
@@ -34,13 +35,9 @@ class CNN():
         self.optimizer = optimizers.Adam(lr=0.001)
         self.loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.metrics = ['accuracy']
-        self.model.compile(loss=self.loss, optimizer=self.optimizer)
 
         self.model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
 
     def __str__(self):
-        self.model.summary(print_fn = self.print_summary)
+        print(self.model.summary())
         return ""
-
-    def print_summary(self, summaryStr):
-        print(summaryStr)
