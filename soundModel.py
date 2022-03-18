@@ -60,17 +60,35 @@ def getData(dataPath):
 def main():
     setCustomCallback()
 
-    dataX, dataY, folders = getData(dataPath)
-    # print(dataX, dataY)
-    trainX, testX, trainY, testY = train_test_split(dataX, dataY, train_size=0.67, random_state=42)
+    # dataX, dataY, folders = getData(dataPath)
+    # # print(dataX, dataY)
+    # trainX, testX, trainY, testY = train_test_split(dataX, dataY, train_size=0.67, random_state=42)
 
-    cnn = CNN((len(trainX[0]), len(trainX[0][0]), 1))
+    train_ds = tf.keras.utils.image_dataset_from_directory(
+        dataPath,
+        validation_split=0.2,
+        subset="training",
+        seed=123,
+        image_size=(5012, 100),
+        batch_size=BATCH_SIZE_TRAIN)
+
+    val_ds = tf.keras.utils.image_dataset_from_directory(
+        dataPath,
+        validation_split=0.2,
+        subset="validation",
+        seed=123,
+        image_size=(5012, 100),
+        batch_size=BATCH_SIZE_TEST)
+
+    dataShape = train_ds.to_numpy().shape
+    print(dataShape)
+    cnn = CNN(datashape[1:])
     print("[INFO] Printing Tensorflow CNN Summary...")
     print(cnn)
 
     global results
-    results = cnn.model.fit(generator(BATCH_SIZE_TRAIN, trainX, trainY),
-        validation_data=generator(BATCH_SIZE_TEST, testX, testY),
+    results = cnn.model.fit(train_ds,
+        validation_data=vals_ds,
         shuffle = True,
         epochs = TRAIN_EPOCHS,
         batch_size = BATCH_SIZE_TRAIN,
